@@ -1,5 +1,19 @@
 package Wordle;
 
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.util.Duration;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,11 +23,25 @@ import java.util.List;
  */
 public class WordleGame {
 
+	@FXML
+	private AnchorPane rootPane;
+
+@FXML
+private GridPane gridPane;
+
 	private List<Guess> guesses;
 	private int maxGuesses;
 	private String referenceWord;
 	public GameSession m_GameSession;
 	public Vocabulary m_Vocabulary;
+	private Label[][] labels;
+	private int lRow = 0;
+	private int lCol = 0;
+
+
+	//My implementation of handling input is keep a buffer of characters,
+	// so we could manipulate this array for different keyboard input.
+	private List<Character> characters = new ArrayList<>();
 
 	public WordleGame(){
 
@@ -28,7 +56,7 @@ public class WordleGame {
 	 * @param word
 	 */
 	public boolean isValidWord(String word){
-		return false;
+		return true;
 	}
 
 	/**
@@ -37,6 +65,84 @@ public class WordleGame {
 	 */
 	public Guess makeGuess(String guess){
 		return null;
+	}
+
+	@FXML
+	private void initialize() {
+		populateLabels();
+	}
+
+	/*
+		populate labels array, so we can use the instances to manipulate stuff.
+	 */
+	private void populateLabels() {
+		labels = new Label[6][5];
+		for (Node node : gridPane.getChildren()) {
+			if (node instanceof Label) {
+				Integer row = GridPane.getRowIndex(node);
+				Integer col = GridPane.getColumnIndex(node);
+				if (row == null) row = 0;
+				if (col == null) col = 0;
+				labels[row][col] = (Label) node;
+			}
+		}
+	}
+
+	/*
+		Handles different keys on virtual keyboard of our GUI.
+	 */
+	@FXML
+	private void handleKeyboardButton(ActionEvent event) {
+		Button b = (Button) event.getSource();
+		String buttonText = b.getText();
+		if (buttonText.equals("ENTER")) {
+			handleEnterButton();
+		} else if (buttonText.equals("BACK")) {
+			handleBackButton();
+		} else {
+			handleLetterKey(buttonText);
+		}
+	}
+
+		/*
+		Handle letters specifically
+	 */
+	private void handleLetterKey(String text) {
+		if (lCol < 5) {
+			labels[lRow][lCol].setText(text);
+			characters.add(text.charAt(0)); // Store character
+			lCol++;
+		}
+	}
+
+
+	private void handleBackButton() {
+		if (lCol > 0) {
+			lCol--;
+			labels[lRow][lCol].setText("");
+			characters.remove(characters.size() - 1); // Remove last character
+		}
+	}
+
+	private void handleEnterButton() {
+		if (lCol == 5) {
+			String word = getWordFromLabel().toUpperCase(); // Ensure uppercase comparison
+		 if (isValidWord(word.toLowerCase())) {
+				//giveFeedBackOnWord(word);
+				lRow++;
+				lCol = 0;
+				characters.clear(); // Clear for next word
+			} else {
+				System.out.println("Word not in list.");
+			}
+		}
+	}
+	private String getWordFromLabel() {
+		StringBuilder word = new StringBuilder();
+		for (int i = 0; i < 5; i++) {
+			word.append(labels[lRow][i].getText());
+		}
+		return word.toString();
 	}
 
 }
