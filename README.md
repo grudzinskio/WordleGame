@@ -11,12 +11,18 @@ Players can enjoy guessing 5-letter words with real-time feedback, while adminis
 To get started with the Wordle implementation in Java, follow these steps:
 
 ### Prerequisites:
-- Make sure you have **Java 21.0.02 (or newer) installed on your machine. You can check your Java version by running:
+- Make sure you have **Java 21.0.2 (or newer) installed on your machine. You can check your Java version by running:
 ```bash
 java -version
 ```
+1. Clone the Repository
+Clone the repository to your local machine using the following command:
 
-### How to use the project
+```bash
+git clone https://gitlab.com/msoe.edu/sdl/y25s2-swe-2710-flynn/s25-flynn-group15
+```
+
+## How to use the project
 
 ## Authors
 Oliver Grudzinski - grudzinskio@msoe.edu   
