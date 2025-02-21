@@ -13,16 +13,17 @@ To get started with the Wordle implementation in Java, follow these steps:
 ### Prerequisites:
 - Make sure you have **Java 21.0.02 (or newer) installed on your machine. You can check your Java version by running:
 ```bash
-java -version ```
+java -version
+```
 
 ### How to use the project
 
 ## Authors
-Oliver Grudzinski - grudzinskio@msoe.edu 
-Mathias Galvan - galvanm@msoe.edu
-Jude Gill - gillj@msoe.edu
-Charles Harris - harrisch@msoe.edu
-Anupranay Thouta - thoutaa@msoe.edu
+Oliver Grudzinski - grudzinskio@msoe.edu   
+Mathias Galvan - galvanm@msoe.edu  
+Jude Gill - gillj@msoe.edu  
+Charles Harris - harrisch@msoe.edu  
+Anupranay Thouta - thoutaa@msoe.edu 
 
 ## Credits and acknowledgment
 We would like to acknowledge and thank the following people and resources that helped make this project possible:
