@@ -23,126 +23,134 @@ import java.util.List;
  */
 public class WordleGame {
 
-	@FXML
-	private AnchorPane rootPane;
+    @FXML
+    private AnchorPane rootPane;
 
-@FXML
-private GridPane gridPane;
+    @FXML
+    public GridPane gridPane;
 
-	private List<Guess> guesses;
-	private int maxGuesses;
-	private String referenceWord;
-	public GameSession m_GameSession;
-	public Vocabulary m_Vocabulary;
-	private Label[][] labels;
-	private int lRow = 0;
-	private int lCol = 0;
+    private List<Guess> guesses;
+    private int maxGuesses;
+    public String referenceWord = "APPLE"; // Example reference word
+    public GameSession m_GameSession;
+    public Vocabulary m_Vocabulary;
+    public Label[][] labels;
+    public int lRow = 0;
+    private int lCol = 0;
 
+    // My implementation of handling input is keep a buffer of characters,
+    // so we could manipulate this array for different keyboard input.
+    private List<Character> characters = new ArrayList<>();
 
-	//My implementation of handling input is keep a buffer of characters,
-	// so we could manipulate this array for different keyboard input.
-	private List<Character> characters = new ArrayList<>();
+    public WordleGame() {
+    }
 
-	public WordleGame(){
+    public boolean checkWin() {
+        return false;
+    }
 
-	}
+    /**
+     * @param word
+     */
+    public boolean isValidWord(String word) {
+        return true;
+    }
 
-	public boolean checkWin(){
-		return false;
-	}
+    /**
+     * @param guess
+     */
+    public Guess makeGuess(String guess) {
+        return null;
+    }
 
-	/**
-	 * 
-	 * @param word
-	 */
-	public boolean isValidWord(String word){
-		return true;
-	}
+    @FXML
+    public void initialize() {
+        populateLabels();
+    }
 
-	/**
-	 * 
-	 * @param guess
-	 */
-	public Guess makeGuess(String guess){
-		return null;
-	}
+    /*
+        populate labels array, so we can use the instances to manipulate stuff.
+     */
+    private void populateLabels() {
+        labels = new Label[6][5];
+        for (Node node : gridPane.getChildren()) {
+            if (node instanceof Label) {
+                Integer row = GridPane.getRowIndex(node);
+                Integer col = GridPane.getColumnIndex(node);
+                if (row == null) row = 0;
+                if (col == null) col = 0;
+                labels[row][col] = (Label) node;
+            }
+        }
+    }
 
-	@FXML
-	private void initialize() {
-		populateLabels();
-	}
+    /*
+        Handles different keys on virtual keyboard of our GUI.
+     */
+    @FXML
+    private void handleKeyboardButton(ActionEvent event) {
+        Button b = (Button) event.getSource();
+        String buttonText = b.getText();
+        if (buttonText.equals("ENTER")) {
+            handleEnterButton();
+        } else if (buttonText.equals("BACK")) {
+            handleBackButton();
+        } else {
+            handleLetterKey(buttonText);
+        }
+    }
 
-	/*
-		populate labels array, so we can use the instances to manipulate stuff.
-	 */
-	private void populateLabels() {
-		labels = new Label[6][5];
-		for (Node node : gridPane.getChildren()) {
-			if (node instanceof Label) {
-				Integer row = GridPane.getRowIndex(node);
-				Integer col = GridPane.getColumnIndex(node);
-				if (row == null) row = 0;
-				if (col == null) col = 0;
-				labels[row][col] = (Label) node;
-			}
-		}
-	}
+    /*
+        Handle letters specifically
+     */
+    private void handleLetterKey(String text) {
+        if (lCol < 5) {
+            labels[lRow][lCol].setText(text);
+            characters.add(text.charAt(0)); // Store character
+            lCol++;
+        }
+    }
 
-	/*
-		Handles different keys on virtual keyboard of our GUI.
-	 */
-	@FXML
-	private void handleKeyboardButton(ActionEvent event) {
-		Button b = (Button) event.getSource();
-		String buttonText = b.getText();
-		if (buttonText.equals("ENTER")) {
-			handleEnterButton();
-		} else if (buttonText.equals("BACK")) {
-			handleBackButton();
-		} else {
-			handleLetterKey(buttonText);
-		}
-	}
+    private void handleBackButton() {
+        if (lCol > 0) {
+            lCol--;
+            labels[lRow][lCol].setText("");
+            characters.remove(characters.size() - 1); // Remove last character
+        }
+    }
 
-		/*
-		Handle letters specifically
-	 */
-	private void handleLetterKey(String text) {
-		if (lCol < 5) {
-			labels[lRow][lCol].setText(text);
-			characters.add(text.charAt(0)); // Store character
-			lCol++;
-		}
-	}
+    private void handleEnterButton() {
+        if (lCol == 5) {
+            String word = getWordFromLabel().toUpperCase(); // Ensure uppercase comparison
+            if (isValidWord(word.toLowerCase())) {
+                giveFeedbackOnWord(word);
+                lRow++;
+                lCol = 0;
+                characters.clear(); // Clear for next word
+            } else {
+                System.out.println("Word not in list.");
+            }
+        }
+    }
 
+    private String getWordFromLabel() {
+        StringBuilder word = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            word.append(labels[lRow][i].getText());
+        }
+        return word.toString();
+    }
 
-	private void handleBackButton() {
-		if (lCol > 0) {
-			lCol--;
-			labels[lRow][lCol].setText("");
-			characters.remove(characters.size() - 1); // Remove last character
-		}
-	}
-
-	private void handleEnterButton() {
-		if (lCol == 5) {
-			String word = getWordFromLabel().toUpperCase(); // Ensure uppercase comparison
-		 if (isValidWord(word.toLowerCase())) {
-				//giveFeedBackOnWord(word);
-				lRow++;
-				lCol = 0;
-				characters.clear(); // Clear for next word
-			} else {
-				System.out.println("Word not in list.");
-			}
-		}
-	}
-	private String getWordFromLabel() {
-		StringBuilder word = new StringBuilder();
-		for (int i = 0; i < 5; i++) {
-			word.append(labels[lRow][i].getText());
-		}
-		return word.toString();
-	}
-
+    public void giveFeedbackOnWord(String word) {
+        for (int i = 0; i < 5; i++) {
+            char letter = word.charAt(i);
+            if (referenceWord.charAt(i) == letter) {
+                labels[lRow][i].setStyle("-fx-background-color: green; -fx-text-fill: white;");
+            } else if (referenceWord.contains(String.valueOf(letter))) {
+                labels[lRow][i].setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
+            } else {
+                labels[lRow][i].setStyle("-fx-background-color: gray; -fx-text-fill: white;");
+            }
+        }
+    }
 }
