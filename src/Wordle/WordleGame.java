@@ -141,6 +141,16 @@ public class WordleGame {
         return word.toString();
     }
 
+    /**
+     * Provides feedback on the guessed word by comparing it to the reference word.
+     * Each letter in the guessed word is checked against the corresponding letter
+     * in the reference word and is styled accordingly:
+     * - Green background if the letter is in the correct position.
+     * - Yellow background if the letter is in the word but in the wrong position.
+     * - Gray background if the letter is not in the word.
+     *
+     * @param word The guessed word to be checked against the reference word.
+     */
     public void giveFeedbackOnWord(String word) {
         for (int i = 0; i < 5; i++) {
             char letter = word.charAt(i);
