@@ -23,6 +23,7 @@ import java.util.List;
  */
 public class WordleGame {
 
+	public Label guess_display;
 	@FXML
 	private AnchorPane rootPane;
 
@@ -64,6 +65,10 @@ private GridPane gridPane;
 	 * @param guess
 	 */
 	public Guess makeGuess(String guess){
+		if(!checkWin()) {
+			int guesses = Integer.parseInt(guess_display.getText());
+			guess_display.setText(String.valueOf(--guesses));
+		}
 		return null;
 	}
 
@@ -132,6 +137,7 @@ private GridPane gridPane;
 				lRow++;
 				lCol = 0;
 				characters.clear(); // Clear for next word
+			 	makeGuess(word);
 			} else {
 				System.out.println("Word not in list.");
 			}
