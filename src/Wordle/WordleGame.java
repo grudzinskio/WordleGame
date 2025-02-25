@@ -9,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -68,6 +69,15 @@ public class WordleGame {
     @FXML
     public void initialize() {
         populateLabels();
+
+        // Ensure rootPane has focus to capture key events
+        Platform.runLater(() -> rootPane.requestFocus());
+
+        // Handle key presses from physical keyboard
+        rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
+
+        //Regain focus when clicking anywhere on the pane
+        rootPane.setOnMouseClicked(event -> rootPane.requestFocus());
     }
 
     /*
@@ -86,6 +96,21 @@ public class WordleGame {
         }
     }
 
+
+    private void handlePhysicalKeyboardInput(KeyEvent event) {
+        if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+            handleEnterButton(); // Submit guess
+        } else if (event.getCode() == javafx.scene.input.KeyCode.BACK_SPACE) {
+            handleBackButton(); // Delete letter
+        } else {
+            String keyText = event.getText().toUpperCase();
+            if (keyText.matches("[A-Z]") && keyText.length() == 1) {
+                handleLetterKey(keyText); // Add letter
+            }
+        }
+    }
+
+
     /*
         Handles different keys on virtual keyboard of our GUI.
      */
@@ -101,6 +126,7 @@ public class WordleGame {
             handleLetterKey(buttonText);
         }
     }
+
 
     /*
         Handle letters specifically
