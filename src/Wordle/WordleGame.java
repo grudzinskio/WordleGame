@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.List;
  */
 public class WordleGame {
 
+    public VBox keyboardBox;
     @FXML
     private AnchorPane rootPane;
 
@@ -156,11 +158,22 @@ public class WordleGame {
             char letter = word.charAt(i);
             if (referenceWord.charAt(i) == letter) {
                 labels[lRow][i].setStyle("-fx-background-color: green; -fx-text-fill: white;");
+                updateKeyboardButtonStyle(letter, "-fx-background-color: green; -fx-text-fill: white;");
             } else if (referenceWord.contains(String.valueOf(letter))) {
                 labels[lRow][i].setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
+                updateKeyboardButtonStyle(letter, "-fx-background-color: yellow; -fx-text-fill: black;");
             } else {
-                labels[lRow][i].setStyle("-fx-background-color: gray; -fx-text-fill: white;");
+                labels[lRow][i].setStyle("-fx-background-color: grey; -fx-text-fill: white;");
+                updateKeyboardButtonStyle(letter, "-fx-background-color: black; -fx-text-fill: white;");
             }
         }
     }
+    private void updateKeyboardButtonStyle(char letter, String style) {
+        keyboardBox.lookupAll(".key").stream()
+                .map(node -> (Button) node) // Assuming all ".key" nodes are Buttons
+                .filter(button -> button.getText().equalsIgnoreCase(String.valueOf(letter)))
+                .findFirst()
+                .ifPresent(button -> button.setStyle(style));
+    }
+
 }
