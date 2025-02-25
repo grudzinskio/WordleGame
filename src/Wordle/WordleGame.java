@@ -199,7 +199,12 @@ public class WordleGame {
                 .map(node -> (Button) node) // Assuming all ".key" nodes are Buttons
                 .filter(button -> button.getText().equalsIgnoreCase(String.valueOf(letter)))
                 .findFirst()
-                .ifPresent(button -> button.setStyle(style));
+                .ifPresent(button -> {
+                    // Check if the button is already green
+                    if (!button.getStyle().contains("green")) {
+                        button.setStyle(style);
+                    }
+                });
     }
 
 }
