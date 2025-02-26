@@ -31,9 +31,7 @@ public class WordleGame {
 
     private List<Guess> guesses;
     private int maxGuesses;
-    public String referenceWord = "APPLE"; // Example reference word
-    public GameSession m_GameSession;
-    public Vocabulary m_Vocabulary;
+    public String referenceWord = "ALLOW"; // Example reference word
     public Label[][] labels;
     public int lRow = 0;
     private int lCol = 0;
@@ -152,14 +150,20 @@ public class WordleGame {
      * @param word The guessed word to be checked against the reference word.
      */
     public void giveFeedbackOnWord(String word) {
+        LetterStatus[] feedback = LetterStatus.getFeedback(word, referenceWord);
+        // Apply styles based on feedback
         for (int i = 0; i < 5; i++) {
-            char letter = word.charAt(i);
-            if (referenceWord.charAt(i) == letter) {
-                labels[lRow][i].setStyle("-fx-background-color: green; -fx-text-fill: white;");
-            } else if (referenceWord.contains(String.valueOf(letter))) {
-                labels[lRow][i].setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
-            } else {
-                labels[lRow][i].setStyle("-fx-background-color: gray; -fx-text-fill: white;");
+            LetterStatus.Status status = feedback[i].getStatus();
+            switch (status) {
+                case CORRECT:
+                    labels[lRow][i].setStyle("-fx-background-color: green; -fx-text-fill: white;");
+                    break;
+                case MISPLACED:
+                    labels[lRow][i].setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
+                    break;
+                case INCORRECT:
+                    labels[lRow][i].setStyle("-fx-background-color: gray; -fx-text-fill: white;");
+                    break;
             }
         }
     }
