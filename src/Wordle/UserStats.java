@@ -65,8 +65,8 @@ public class UserStats implements Observer {
 	 * updates user's stats based on inputted guess
 	 * @param guess word being guessed
 	 */
-	public void updateStats(Guess guess){
-		String[] letters = guess.getWord().toLowerCase().split("");
+	public void updateStats(String guess){
+		String[] letters = guess.toLowerCase().split("");
 		for(String i : letters) {
 			int frequency = commonLetters.get(i);
 			frequency++;

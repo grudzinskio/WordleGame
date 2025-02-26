@@ -126,5 +126,6 @@
             <Insets />
          </opaqueInsets>
       </VBox>
+      <Button layoutX="31.0" layoutY="237.0" mnemonicParsing="false" onAction="#viewStats" styleClass="key" text="View Stats" />
     </children>
 </AnchorPane>

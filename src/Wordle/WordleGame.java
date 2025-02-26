@@ -4,15 +4,23 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +41,7 @@ private GridPane gridPane;
 	private List<Guess> guesses;
 	private int maxGuesses;
 	private String referenceWord;
+	private UserStats userStats;
 	public GameSession m_GameSession;
 	public Vocabulary m_Vocabulary;
 	private Label[][] labels;
@@ -68,6 +77,9 @@ private GridPane gridPane;
 		if(!checkWin()) {
 			int guesses = Integer.parseInt(guess_display.getText());
 			guess_display.setText(String.valueOf(--guesses));
+
+			userStats.updateStats(guess);
+
 		}
 		return null;
 	}
@@ -75,6 +87,8 @@ private GridPane gridPane;
 	@FXML
 	private void initialize() {
 		populateLabels();
+		userStats = new UserStats();
+
 	}
 
 	/*
@@ -151,4 +165,12 @@ private GridPane gridPane;
 		return word.toString();
 	}
 
+	public void viewStats(ActionEvent actionEvent) throws IOException {
+		Parent stats = FXMLLoader.load(getClass().getResource("Stats_Display.fxml"));
+		Scene scene = new Scene(stats);
+		Stage stage = new Stage();
+		stage.setScene(scene);
+		stage.setTitle("User Stats");
+		stage.show();
+	}
 }
