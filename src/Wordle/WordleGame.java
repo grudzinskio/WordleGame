@@ -190,15 +190,15 @@ public class WordleGame {
             switch (status) {
                 case CORRECT:
                     labels[lRow][i].setStyle("-fx-background-color: green; -fx-text-fill: white;");
-                    updateKeyboardButtonStyle(letter, "-fx-background-color: green; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: green; -fx-text-fill: white;");
                     break;
                 case MISPLACED:
                     labels[lRow][i].setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
-                    updateKeyboardButtonStyle(letter, "-fx-background-color: yellow; -fx-text-fill: black;");
+                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: yellow; -fx-text-fill: black;");
                     break;
                 case INCORRECT:
                     labels[lRow][i].setStyle("-fx-background-color: gray; -fx-text-fill: white;");
-                    updateKeyboardButtonStyle(letter, "-fx-background-color: black; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: black; -fx-text-fill: white;");
                     break;
             }
         }
