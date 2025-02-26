@@ -9,8 +9,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
  */
 public class WordleGame {
 
+    public VBox keyboardBox;
     @FXML
     private AnchorPane rootPane;
 
@@ -61,9 +64,23 @@ public class WordleGame {
         return null;
     }
 
+
+    /**
+     * Initialize the game by populating the labels array and setting up the event
+     * handlers for key presses and mouse clicks.
+     */
     @FXML
     public void initialize() {
         populateLabels();
+
+        // Ensure rootPane has focus to capture key events
+        Platform.runLater(() -> rootPane.requestFocus());
+
+        // Handle key presses from physical keyboard
+        rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
+
+        //Regain focus when clicking anywhere on the pane
+        rootPane.setOnMouseClicked(event -> rootPane.requestFocus());
     }
 
     /*
@@ -82,6 +99,21 @@ public class WordleGame {
         }
     }
 
+
+    private void handlePhysicalKeyboardInput(KeyEvent event) {
+        if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+            handleEnterButton(); // Submit guess
+        } else if (event.getCode() == javafx.scene.input.KeyCode.BACK_SPACE) {
+            handleBackButton(); // Delete letter
+        } else {
+            String keyText = event.getText().toUpperCase();
+            if (keyText.matches("[A-Z]") && keyText.length() == 1) {
+                handleLetterKey(keyText); // Add letter
+            }
+        }
+    }
+
+
     /*
         Handles different keys on virtual keyboard of our GUI.
      */
@@ -97,6 +129,7 @@ public class WordleGame {
             handleLetterKey(buttonText);
         }
     }
+
 
     /*
         Handle letters specifically
@@ -157,14 +190,37 @@ public class WordleGame {
             switch (status) {
                 case CORRECT:
                     labels[lRow][i].setStyle("-fx-background-color: green; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(letter, "-fx-background-color: green; -fx-text-fill: white;");
                     break;
                 case MISPLACED:
                     labels[lRow][i].setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
+                    updateKeyboardButtonStyle(letter, "-fx-background-color: yellow; -fx-text-fill: black;");
                     break;
                 case INCORRECT:
                     labels[lRow][i].setStyle("-fx-background-color: gray; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(letter, "-fx-background-color: black; -fx-text-fill: white;");
                     break;
             }
         }
     }
+    /**
+     * Updates the style of the keyboard button corresponding to the given letter.
+     * The style is updated to the given style if the button is not already green.
+     *
+     * @param letter The letter corresponding to the keyboard button.
+     * @param style  The new style to be applied to the button.
+     */
+    private void updateKeyboardButtonStyle(char letter, String style) {
+        keyboardBox.lookupAll(".key").stream()
+                .map(node -> (Button) node) // Assuming all ".key" nodes are Buttons
+                .filter(button -> button.getText().equalsIgnoreCase(String.valueOf(letter)))
+                .findFirst()
+                .ifPresent(button -> {
+                    // Check if the button is already green
+                    if (!button.getStyle().contains("green")) {
+                        button.setStyle(style);
+                    }
+                });
+    }
+
 }
