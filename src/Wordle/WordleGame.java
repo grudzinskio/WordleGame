@@ -66,6 +66,11 @@ public class WordleGame {
         return null;
     }
 
+
+    /**
+     * Initialize the game by populating the labels array and setting up the event
+     * handlers for key presses and mouse clicks.
+     */
     @FXML
     public void initialize() {
         populateLabels();
@@ -194,6 +199,13 @@ public class WordleGame {
             }
         }
     }
+    /**
+     * Updates the style of the keyboard button corresponding to the given letter.
+     * The style is updated to the given style if the button is not already green.
+     *
+     * @param letter The letter corresponding to the keyboard button.
+     * @param style  The new style to be applied to the button.
+     */
     private void updateKeyboardButtonStyle(char letter, String style) {
         keyboardBox.lookupAll(".key").stream()
                 .map(node -> (Button) node) // Assuming all ".key" nodes are Buttons
