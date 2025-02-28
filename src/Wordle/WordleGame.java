@@ -43,8 +43,8 @@ public class WordleGame {
 	private int maxGuesses;
 	private String referenceWord;
 	private UserStats userStats;
-	public GameSession m_GameSession;
-	public Vocabulary m_Vocabulary;
+	public GameSession gameSession;
+	public Vocabulary vocabulary;
 	private Label[][] labels;
 	private int lRow = 0;
 	private int lCol = 0;
@@ -95,7 +95,10 @@ public class WordleGame {
 	 * @param word
 	 */
 	public boolean isValidWord(String word){
-		return true;
+		vocabulary = new Vocabulary();
+		vocabulary.loadWords();
+		List<String> words = 	vocabulary.getWords();
+		return words.contains(word);
 	}
 
 	/**
@@ -170,17 +173,16 @@ public class WordleGame {
         }
     }
 
-
-    /*
-        Handle letters specifically
-     */
-    private void handleLetterKey(String text) {
-        if (lCol < 5) {
-            labels[lRow][lCol].setText(text);
-            characters.add(text.charAt(0)); // Store character
-            lCol++;
-        }
-    }
+		/*
+		 Handle letters specifically
+	 */
+	private void handleLetterKey(String text) {
+		if (lCol < 5) {
+			labels[lRow][lCol].setText(text);
+			characters.add(text.charAt(0)); // Store character
+			lCol++;
+		}
+	}
 
     private void handleBackButton() {
         if (lCol > 0) {
@@ -204,15 +206,13 @@ public class WordleGame {
         }
     }
 
-    private String getWordFromLabel() {
-        StringBuilder word = new StringBuilder();
-        for (int i = 0; i < 5; i++) {
-            word.append(labels[lRow][i].getText());
-        }
-        return word.toString();
-    }
-
-    /**
+	private String getWordFromLabel() {
+		StringBuilder word = new StringBuilder();
+		for (int i = 0; i < 5; i++) {
+			word.append(labels[lRow][i].getText());
+		}
+		return word.toString();
+	}/**
      * Provides feedback on the guessed word by comparing it to the reference word.
      * Each letter in the guessed word is checked against the corresponding letter
      * in the reference word and is styled accordingly:
