@@ -9,7 +9,6 @@ public class User {
 
 	private UserStats stats;
 	private String userName;
-	public UserStats m_UserStats;
 
 	public User(){
 
