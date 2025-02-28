@@ -10,14 +10,11 @@ import java.util.List;
  * @created 14-Feb-2025 1:30:56 PM
  */
 public class GameSession {
-
 	private WordleGame game;
 	private List<Observer> observers;
-
-	public GameSession(){
+	public GameSession() {
 
 	}
-
 	/**
 	 * 
 	 * @param observer

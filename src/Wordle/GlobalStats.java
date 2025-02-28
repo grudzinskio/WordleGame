@@ -4,6 +4,7 @@ import javafx.event.Event;
 
 import java.util.List;
 
+
 /**
  * @author gillj
  * @version 1.0
@@ -12,6 +13,8 @@ import java.util.List;
 public class GlobalStats implements Observer {
 
 	private int aggregateGuessCount;
+
+
 
 	public GlobalStats(){
 
