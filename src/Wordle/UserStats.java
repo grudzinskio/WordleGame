@@ -17,15 +17,21 @@ import java.util.Map;
  * Tracks individual stats for players
  */
 public class UserStats implements Observer {
+	private static final UserStats instance = new UserStats();
 
 	private Map<String, Integer> commonLetters = new HashMap(26);
 	private Map date;
 	private int guessCount;
-	private int avgGuess;
+	private double avgGuess;
+	private int games;
 
 	public UserStats(){
 		initCommonLetters();
 
+	}
+
+	public static UserStats getInstance() {
+		return instance;
 	}
 
 	private void initCommonLetters() {
@@ -58,18 +64,25 @@ public class UserStats implements Observer {
 	}
 
 	public double getAverageGuesses(){
-		return 0;
+		avgGuess = ((double) guessCount) /games;
+		return avgGuess;
 	}
-
+	
+	public void updateGamesCount() {
+		games++;
+	}
 	/**
 	 * updates user's stats based on inputted guess
 	 * @param guess word being guessed
 	 */
 	public void updateStats(String guess){
 		String[] letters = guess.toLowerCase().split("");
+
+		guessCount++;
 		for(String i : letters) {
 			int frequency = commonLetters.get(i);
 			frequency++;
+
 			commonLetters.put(i, frequency);
 		}
 	}
@@ -80,5 +93,9 @@ public class UserStats implements Observer {
 	@Override
 	public void update(Event event) {
 
+	}
+
+	public double getGamesCount() {
+		return games;
 	}
 }
