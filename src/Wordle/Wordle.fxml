@@ -11,9 +11,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="634.0" prefWidth="582.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleGame">
+<AnchorPane id="rootPane" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="634.0" prefWidth="582.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleGame">
     <children>
-        <VBox alignment="BOTTOM_CENTER" layoutY="406.0" prefHeight="213.0" prefWidth="582.0" spacing="10.0">
+        <VBox fx:id="keyboardBox" alignment="BOTTOM_CENTER" layoutY="406.0" prefHeight="213.0" prefWidth="582.0" spacing="10.0">
             <children>
                 <HBox alignment="CENTER" prefHeight="61.0" prefWidth="493.0" spacing="5.0">
                     <children>
