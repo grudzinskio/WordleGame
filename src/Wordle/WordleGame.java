@@ -7,7 +7,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -17,6 +19,7 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author gillj
@@ -48,8 +51,12 @@ public class WordleGame {
     public WordleGame() {
     }
 
-    public boolean checkWin() {
-        return false;
+    public boolean checkWin(String word) {
+        if (Objects.equals(word, referenceWord)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -198,7 +205,40 @@ public class WordleGame {
                 updateKeyboardButtonStyle(letter, "-fx-background-color: black; -fx-text-fill: white;");
             }
         }
+        if (checkWin(word)) {
+            showCongratulationsMessage();
+
+        }
     }
+
+    private void showCongratulationsMessage() {
+        PauseTransition delay = new PauseTransition(Duration.seconds(0.5));
+        delay.setOnFinished(event -> {
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("CONGRATULATIONS!!!");
+                alert.setHeaderText("You Won!");
+                alert.setContentText("You guessed the word correctly!");
+
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+                alert.showAndWait();
+            });
+        });
+        delay.play();
+        disableInput();
+    }
+
+    private void disableInput() {
+        rootPane.setOnKeyPressed(null);
+        keyboardBox.getChildren().forEach(node -> {
+            if (node instanceof Button) {
+                node.setDisable(true);
+            }
+        });
+    }
+
     /**
      * Updates the style of the keyboard button corresponding to the given letter.
      * The style is updated to the given style if the button is not already green.
