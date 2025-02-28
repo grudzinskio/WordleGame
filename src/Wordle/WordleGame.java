@@ -1,22 +1,25 @@
 package Wordle;
 
-import javafx.animation.PauseTransition;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+
+import javafx.stage.Stage;
+
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +31,9 @@ import java.util.Objects;
  */
 public class WordleGame {
 
+	public Label guess_display;
+	
+	
     public VBox keyboardBox;
     @FXML
     private AnchorPane rootPane;
@@ -35,14 +41,20 @@ public class WordleGame {
     @FXML
     public GridPane gridPane;
 
-    private List<Guess> guesses;
-    private int maxGuesses;
-    public String referenceWord = "APPLE"; // Example reference word
-    public GameSession m_GameSession;
-    public Vocabulary m_Vocabulary;
-    public Label[][] labels;
-    public int lRow = 0;
-    private int lCol = 0;
+
+	private List<Guess> guesses;
+	private int maxGuesses;
+	private String referenceWord;
+	private UserStats userStats;
+	public GameSession m_GameSession;
+	public Vocabulary m_Vocabulary;
+	private Label[][] labels;
+	private int lRow = 0;
+	private int lCol = 0;
+
+    
+    public String referenceWord = "ALLOW"; // Example reference word
+    
 
     // My implementation of handling input is keep a buffer of characters,
     // so we could manipulate this array for different keyboard input.
@@ -59,19 +71,8 @@ public class WordleGame {
         }
     }
 
-    /**
-     * @param word
-     */
-    public boolean isValidWord(String word) {
-        return true;
-    }
-
-    /**
-     * @param guess
-     */
-    public Guess makeGuess(String guess) {
-        return null;
-    }
+    
+    
 
 
     /**
@@ -80,6 +81,10 @@ public class WordleGame {
      */
     @FXML
     public void initialize() {
+        
+		userStats = UserStats.getInstance();
+		userStats.updateGamesCount();
+
         populateLabels();
 
         // Ensure rootPane has focus to capture key events
@@ -91,6 +96,40 @@ public class WordleGame {
         //Regain focus when clicking anywhere on the pane
         rootPane.setOnMouseClicked(event -> rootPane.requestFocus());
     }
+
+	/**
+	 * 
+	 * @param word
+	 */
+	public boolean isValidWord(String word){
+		return true;
+	}
+
+	/**
+	 * 
+	 * @param guess
+	 */
+	public Guess makeGuess(String guess){
+		if(!checkWin()) {
+			int guesses = Integer.parseInt(guess_display.getText());
+			guess_display.setText(String.valueOf(--guesses));
+
+			userStats.updateStats(guess);
+
+		}
+		return null;
+	}
+
+		/*
+		Handle letters specifically
+	 */
+	private void handleLetterKey(String text) {
+		if (lCol < 5) {
+			labels[lRow][lCol].setText(text);
+			characters.add(text.charAt(0)); // Store character
+			lCol++;
+		}
+	}
 
     /*
         populate labels array, so we can use the instances to manipulate stuff.
@@ -121,7 +160,6 @@ public class WordleGame {
             }
         }
     }
-
 
     /*
         Handles different keys on virtual keyboard of our GUI.
@@ -192,17 +230,23 @@ public class WordleGame {
      * @param word The guessed word to be checked against the reference word.
      */
     public void giveFeedbackOnWord(String word) {
+        LetterStatus[] feedback = LetterStatus.getFeedback(word, referenceWord);
+        // Apply styles based on feedback
         for (int i = 0; i < 5; i++) {
-            char letter = word.charAt(i);
-            if (referenceWord.charAt(i) == letter) {
-                labels[lRow][i].setStyle("-fx-background-color: green; -fx-text-fill: white;");
-                updateKeyboardButtonStyle(letter, "-fx-background-color: green; -fx-text-fill: white;");
-            } else if (referenceWord.contains(String.valueOf(letter))) {
-                labels[lRow][i].setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
-                updateKeyboardButtonStyle(letter, "-fx-background-color: yellow; -fx-text-fill: black;");
-            } else {
-                labels[lRow][i].setStyle("-fx-background-color: grey; -fx-text-fill: white;");
-                updateKeyboardButtonStyle(letter, "-fx-background-color: black; -fx-text-fill: white;");
+            LetterStatus.Status status = feedback[i].getStatus();
+            switch (status) {
+                case CORRECT:
+                    labels[lRow][i].setStyle("-fx-background-color: green; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: green; -fx-text-fill: white;");
+                    break;
+                case MISPLACED:
+                    labels[lRow][i].setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
+                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: yellow; -fx-text-fill: black;");
+                    break;
+                case INCORRECT:
+                    labels[lRow][i].setStyle("-fx-background-color: gray; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: black; -fx-text-fill: white;");
+                    break;
             }
         }
         if (checkWin(word)) {
@@ -259,4 +303,21 @@ public class WordleGame {
                 });
     }
 
+
+	/**
+	 * Created by Mathias G
+	 * This launches the secondary window pop-up to display a user's stats
+	 * @param actionEvent actionEvent is when the View Stats button is clicked
+	 * @throws IOException Exception thrown if fxml issues occur and file can't be loaded
+	 */
+	public void viewStats(ActionEvent actionEvent) throws IOException {
+		Parent stats = FXMLLoader.load(getClass().getResource("Stats_Display.fxml"));
+		Scene scene = new Scene(stats);
+		Stage stage = new Stage();
+
+
+		stage.setScene(scene);
+		stage.setTitle("User Stats");
+		stage.show();
+	}
 }
