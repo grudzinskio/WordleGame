@@ -1,5 +1,6 @@
 package Wordle;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -41,7 +42,7 @@ public class WordleGame {
 
 	private List<Guess> guesses;
 	private int maxGuesses;
-	private String referenceWord;
+	private String referenceWord = "ALLOW";
 	private UserStats userStats;
 	public GameSession gameSession;
 	public Vocabulary vocabulary;
@@ -50,7 +51,7 @@ public class WordleGame {
 	private int lCol = 0;
 
     
-    public String referenceWord = "ALLOW"; // Example reference word
+   // public String referenceWord = "ALLOW"; // Example reference word
     
 
     // My implementation of handling input is keep a buffer of characters,
@@ -119,13 +120,13 @@ public class WordleGame {
 		/*
 		Handle letters specifically
 	 */
-	private void handleLetterKey(String text) {
-		if (lCol < 5) {
-			labels[lRow][lCol].setText(text);
-			characters.add(text.charAt(0)); // Store character
-			lCol++;
-		}
-	}
+//	private void handleLetterKey(String text) {
+//		if (lCol < 5) {
+//			labels[lRow][lCol].setText(text);
+//			characters.add(text.charAt(0)); // Store character
+//			lCol++;
+//		}
+//	}
 
     /*
         populate labels array, so we can use the instances to manipulate stuff.
