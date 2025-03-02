@@ -30,8 +30,8 @@ import java.util.List;
 public class WordleGame {
 
 	public Label guess_display;
-	
-	
+
+
     public VBox keyboardBox;
     @FXML
     private AnchorPane rootPane;
@@ -50,9 +50,9 @@ public class WordleGame {
 	private int lRow = 0;
 	private int lCol = 0;
 
-    
+
    // public String referenceWord = "ALLOW"; // Example reference word
-    
+
 
     // My implementation of handling input is keep a buffer of characters,
     // so we could manipulate this array for different keyboard input.
@@ -61,13 +61,13 @@ public class WordleGame {
     public WordleGame() {
     }
 
-    public boolean checkWin() {
-        return false;
+    public boolean checkWin(String word) {
+        if (word.equals(referenceWord)) {
+            return true;
+        } else {
+            return false;
+        }
     }
-
-    
-    
-
 
     /**
      * Initialize the game by populating the labels array and setting up the event
@@ -75,7 +75,7 @@ public class WordleGame {
      */
     @FXML
     public void initialize() {
-        
+
 		userStats = UserStats.getInstance();
 		userStats.updateGamesCount();
 
@@ -92,29 +92,26 @@ public class WordleGame {
     }
 
 	/**
-	 * 
+	 *
 	 * @param word
 	 */
 	public boolean isValidWord(String word){
 		vocabulary = new Vocabulary();
 		vocabulary.loadWords();
-		List<String> words = 	vocabulary.getWords();
+		List<String> words = vocabulary.getWords();
 		return words.contains(word);
 	}
 
 	/**
-	 * 
+	 *
 	 * @param guess
 	 */
-	public Guess makeGuess(String guess){
-		if(!checkWin()) {
-			int guesses = Integer.parseInt(guess_display.getText());
-			guess_display.setText(String.valueOf(--guesses));
-
-			userStats.updateStats(guess);
-
-		}
-		return null;
+	public void makeGuess(String guess){
+        if (!isValidWord(guess)) {
+            int guesses = Integer.parseInt(guess_display.getText());
+            guess_display.setText(String.valueOf(--guesses));
+            userStats.updateStats(guess);
+        }
 	}
 
 		/*
@@ -225,6 +222,7 @@ public class WordleGame {
      */
     public void giveFeedbackOnWord(String word) {
         LetterStatus[] feedback = LetterStatus.getFeedback(word, referenceWord);
+        makeGuess(word);
         // Apply styles based on feedback
         for (int i = 0; i < 5; i++) {
             LetterStatus.Status status = feedback[i].getStatus();
@@ -243,7 +241,21 @@ public class WordleGame {
                     break;
             }
         }
+        if (checkWin(word)) {
+            disableInput();
+            System.out.println("You guessed the word correctly!");
+        }
     }
+
+    private void disableInput() {
+        rootPane.setOnKeyPressed(null);
+        keyboardBox.getChildren().forEach(node -> {
+            if (node instanceof Button) {
+                node.setDisable(true);
+            }
+        });
+    }
+
     /**
      * Updates the style of the keyboard button corresponding to the given letter.
      * The style is updated to the given style if the button is not already green.
