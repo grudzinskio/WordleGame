@@ -30,8 +30,8 @@ import java.util.List;
 public class WordleGame {
 
 	public Label guess_display;
-	
-	
+
+
     public VBox keyboardBox;
     @FXML
     private AnchorPane rootPane;
@@ -50,9 +50,9 @@ public class WordleGame {
 	private int lRow = 0;
 	private int lCol = 0;
 
-    
+
    // public String referenceWord = "ALLOW"; // Example reference word
-    
+
 
     // My implementation of handling input is keep a buffer of characters,
     // so we could manipulate this array for different keyboard input.
@@ -75,7 +75,7 @@ public class WordleGame {
      */
     @FXML
     public void initialize() {
-        
+
 		userStats = UserStats.getInstance();
 		userStats.updateGamesCount();
 
@@ -92,7 +92,7 @@ public class WordleGame {
     }
 
 	/**
-	 * 
+	 *
 	 * @param word
 	 */
 	public boolean isValidWord(String word){
@@ -103,7 +103,7 @@ public class WordleGame {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param guess
 	 */
 	public void makeGuess(String guess){
