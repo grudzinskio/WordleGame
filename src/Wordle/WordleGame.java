@@ -237,7 +237,7 @@ public class WordleGame {
                     break;
                 case INCORRECT:
                     labels[lRow][i].setStyle("-fx-background-color: gray; -fx-text-fill: white;");
-                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: black; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: #4F4F4F; -fx-text-fill: white;");
                     break;
             }
         }
