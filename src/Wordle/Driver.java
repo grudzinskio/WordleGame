@@ -26,11 +26,8 @@ public class Driver extends Application {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(getClass().getResource("Wordle.fxml"));
 		Pane root = loader.load();
-		Label label = new Label("Hello Wordle");
-		root.getChildren().add(label);
 		stage.setTitle("Wordle");
 		stage.setScene(new Scene(root));
 		stage.show();
 	}
-
 }
