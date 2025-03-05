@@ -1,0 +1,28 @@
+.root {
+    -fx-background-color: #121213;
+}
+
+.key {
+    -fx-background-color: #818384;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5px;
+}
+
+.key:hover {
+    -fx-border-color: #ffcc00;
+    -fx-border-width: 2px;
+}
+
+.word-cell {
+    -fx-min-width: 50px;
+    -fx-min-height: 50px;
+    -fx-alignment: center;
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
