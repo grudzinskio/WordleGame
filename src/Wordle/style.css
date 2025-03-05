@@ -10,6 +10,11 @@
     -fx-border-radius: 5px;
 }
 
+.key:hover {
+    -fx-border-color: #ffcc00;
+    -fx-border-width: 2px;
+}
+
 .word-cell {
     -fx-min-width: 50px;
     -fx-min-height: 50px;
