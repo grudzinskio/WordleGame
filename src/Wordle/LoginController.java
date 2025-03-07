@@ -41,15 +41,25 @@ public class LoginController {
      */
     @FXML
     private void handleLogin() {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-        String accountType = accountTypeField.getText();
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
+        String accountType = accountTypeField.getText().trim();
+
+        // Validate that username and password meet requirements
+        if (username.length() < 3) {
+            showAlert(Alert.AlertType.ERROR, "Login Failed", "Username must be at least 3 characters long.");
+            return;
+        }
+        if (password.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Login Failed", "Password cannot be empty.");
+            return;
+        }
 
         if (authenticateUser(username, password, accountType)) {
-            showAlert(AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
+            showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
             switchToWordleGame();
         } else {
-            showAlert(AlertType.ERROR, "Login Failed", "Invalid username, password, or account type.");
+            showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid username, password, or account type.");
         }
     }
 
@@ -58,18 +68,28 @@ public class LoginController {
      */
     @FXML
     private void handleSignUp() {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-        String accountType = accountTypeField.getText();
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
+        String accountType = accountTypeField.getText().trim();
+
+        // Validate that username and password meet requirements
+        if (username.length() < 3) {
+            showAlert(Alert.AlertType.ERROR, "Sign Up Failed", "Username must be at least 3 characters long.");
+            return;
+        }
+        if (password.isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Sign Up Failed", "Password cannot be empty.");
+            return;
+        }
 
         if (accountType.equalsIgnoreCase("Admin") || accountType.equalsIgnoreCase("RegularUser")) {
             if (createAccount(username, password, accountType)) {
-                showAlert(AlertType.INFORMATION, "Sign Up Successful", "Account created for " + username + "!");
+                showAlert(Alert.AlertType.INFORMATION, "Sign Up Successful", "Account created for " + username + "!");
             } else {
-                showAlert(AlertType.ERROR, "Sign Up Failed", "Username already exists.");
+                showAlert(Alert.AlertType.ERROR, "Sign Up Failed", "Username already exists.");
             }
         } else {
-            showAlert(AlertType.ERROR, "Sign Up Failed", "Invalid account type. Use 'Admin' or 'RegularUser'.");
+            showAlert(Alert.AlertType.ERROR, "Sign Up Failed", "Invalid account type. Use 'Admin' or 'RegularUser'.");
         }
     }
 
