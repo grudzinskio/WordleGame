@@ -26,3 +26,19 @@
     -fx-font-weight: bold;
     -fx-text-fill: white;
 }
+
+.label {
+    -fx-text-fill: white;
+}
+
+.button {
+    -fx-background-color: #3c3f41;
+    -fx-text-fill: white;
+    -fx-border-color: #555555;
+}
+
+.text-field, .password-field {
+    -fx-background-color: #3c3f41;
+    -fx-text-fill: white;
+    -fx-border-color: #555555;
+}
