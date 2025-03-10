@@ -1,5 +1,4 @@
 Admin 123 Admin
-User 123 RegularUserpiece pieces Regularuser
 piece pieces RegularUser
 IronMan123 ironrod RegularUser
 SpiderMan MJ RegularUser
