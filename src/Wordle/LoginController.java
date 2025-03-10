@@ -31,9 +31,6 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
-    @FXML
-    private TextField accountTypeField;
-
     private static final String DATABASE_FILE = "src/Wordle/accounts.txt";
 
     /**
@@ -43,7 +40,6 @@ public class LoginController {
     private void handleLogin() {
         String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
-        String accountType = accountTypeField.getText().trim();
 
         // Validate that username and password meet requirements
         if (username.length() < 3) {
@@ -55,11 +51,11 @@ public class LoginController {
             return;
         }
 
-        if (authenticateUser(username, password, accountType)) {
+        if (authenticateUser(username, password)) {
             showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
             switchToWordleGame();
         } else {
-            showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid username, password, or account type.");
+            showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid username or password.");
         }
     }
 
@@ -70,7 +66,6 @@ public class LoginController {
     private void handleSignUp() {
         String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
-        String accountType = accountTypeField.getText().trim();
 
         // Validate that username and password meet requirements
         if (username.length() < 3) {
@@ -82,31 +77,25 @@ public class LoginController {
             return;
         }
 
-        if (accountType.equalsIgnoreCase("Admin") || accountType.equalsIgnoreCase("RegularUser")) {
-            if (createAccount(username, password, accountType)) {
-                showAlert(Alert.AlertType.INFORMATION, "Sign Up Successful", "Account created for " + username + "!");
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Sign Up Failed", "Username already exists.");
-            }
+        if (createAccount(username, password)) {
+            showAlert(Alert.AlertType.INFORMATION, "Sign Up Successful", "Account created for " + username + "!");
         } else {
-            showAlert(Alert.AlertType.ERROR, "Sign Up Failed", "Invalid account type. Use 'Admin' or 'RegularUser'.");
-        }
+            showAlert(Alert.AlertType.ERROR, "Sign Up Failed", "Username already exists.");
+        } 
     }
 
     /**
-     * Authenticates the user by checking the username, password, and account type against the database.
-     * 
+     * Authenticates the user by checking the username and password in the database.
      * @param username The username entered by the user.
      * @param password The password entered by the user.
-     * @param accountType The account type entered by the user.
      * @return True if the user is authenticated, false otherwise.
      */
-    private boolean authenticateUser(String username, String password, String accountType) {
+    private boolean authenticateUser(String username, String password) {
         try (BufferedReader reader = new BufferedReader(new FileReader(DATABASE_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(" ");
-                if (parts.length == 3 && parts[0].equals(username) && parts[1].equals(password) && parts[2].equalsIgnoreCase(accountType)) {
+                if (parts.length == 3 && parts[0].equals(username) && parts[1].equals(password)) {
                     return true;
                 }
             }
@@ -117,14 +106,13 @@ public class LoginController {
     }
 
     /**
-     * Creates a new account with the specified username, password, and account type.
+     * Creates a new account with the specified username and password.
      * 
      * @param username The username entered by the user.
      * @param password The password entered by the user.
-     * @param accountType The account type entered by the user.
      * @return True if the account is created successfully, false otherwise.
      */
-    private boolean createAccount(String username, String password, String accountType) {
+    private boolean createAccount(String username, String password) {
         try (BufferedReader reader = new BufferedReader(new FileReader(DATABASE_FILE))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -138,7 +126,7 @@ public class LoginController {
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATABASE_FILE, true))) {
-            writer.write(username + " " + password + " " + accountType);
+            writer.write(username + " " + password + " " + "RegularUser");
             writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
