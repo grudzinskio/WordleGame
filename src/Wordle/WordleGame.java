@@ -23,61 +23,61 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author gillj
+ * The WordleGame class handles the game logic and user interactions for the Wordle game.
+ * It manages the game state, validates user guesses, and provides feedback on the guessed words.
+ * 
  * @version 1.0
  * @created 14-Feb-2025 1:31:10 PM
  */
 public class WordleGame {
 
-	public Label guess_display;
-
-
-    public VBox keyboardBox;
     @FXML
     private AnchorPane rootPane;
 
     @FXML
     public GridPane gridPane;
 
+    @FXML
+    public VBox keyboardBox;
 
-	private List<Guess> guesses;
-	private int maxGuesses;
-	private String referenceWord = "ALLOW";
-	private UserStats userStats;
-	public GameSession gameSession;
-	public Vocabulary vocabulary;
-	private Label[][] labels;
-	private int lRow = 0;
-	private int lCol = 0;
+    public Label guess_display;
 
-
-   // public String referenceWord = "ALLOW"; // Example reference word
-
+    private List<Guess> guesses;
+    private int maxGuesses;
+    private String referenceWord = "ALLOW"; // Example reference word
+    private UserStats userStats;
+    private Vocabulary vocabulary;
+    private Label[][] labels;
+    private int lRow = 0;
+    private int lCol = 0;
 
     // My implementation of handling input is keep a buffer of characters,
     // so we could manipulate this array for different keyboard input.
     private List<Character> characters = new ArrayList<>();
 
     public WordleGame() {
-    }
-
-    public boolean checkWin(String word) {
-        if (word.equals(referenceWord)) {
-            return true;
-        } else {
-            return false;
-        }
+        vocabulary = new Vocabulary();
+        vocabulary.loadWords("src/Wordle/wordle-official-1.txt"); // Load dictionary words
     }
 
     /**
-     * Initialize the game by populating the labels array and setting up the event
+     * Checks if the guessed word matches the reference word.
+     * 
+     * @param word The guessed word.
+     * @return True if the guessed word matches the reference word, false otherwise.
+     */
+    public boolean checkWin(String word) {
+        return word.equals(referenceWord);
+    }
+
+    /**
+     * Initializes the game by populating the labels array and setting up the event
      * handlers for key presses and mouse clicks.
      */
     @FXML
     public void initialize() {
-
-		userStats = UserStats.getInstance();
-		userStats.updateGamesCount();
+        userStats = UserStats.getInstance();
+        userStats.updateGamesCount();
 
         populateLabels();
 
@@ -87,46 +87,12 @@ public class WordleGame {
         // Handle key presses from physical keyboard
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
 
-        //Regain focus when clicking anywhere on the pane
+        // Regain focus when clicking anywhere on the pane
         rootPane.setOnMouseClicked(event -> rootPane.requestFocus());
     }
 
-	/**
-	 *
-	 * @param word
-	 */
-	public boolean isValidWord(String word){
-		vocabulary = new Vocabulary();
-		vocabulary.loadWords();
-		List<String> words = vocabulary.getWords();
-		return words.contains(word);
-	}
-
-	/**
-	 *
-	 * @param guess
-	 */
-	public void makeGuess(String guess){
-        if (!isValidWord(guess)) {
-            int guesses = Integer.parseInt(guess_display.getText());
-            guess_display.setText(String.valueOf(--guesses));
-            userStats.updateStats(guess);
-        }
-	}
-
-		/*
-		Handle letters specifically
-	 */
-//	private void handleLetterKey(String text) {
-//		if (lCol < 5) {
-//			labels[lRow][lCol].setText(text);
-//			characters.add(text.charAt(0)); // Store character
-//			lCol++;
-//		}
-//	}
-
-    /*
-        populate labels array, so we can use the instances to manipulate stuff.
+    /**
+     * Populates the labels array with Label instances from the gridPane.
      */
     private void populateLabels() {
         labels = new Label[6][5];
@@ -141,7 +107,11 @@ public class WordleGame {
         }
     }
 
-
+    /**
+     * Handles key presses from the physical keyboard.
+     * 
+     * @param event The KeyEvent representing the key press.
+     */
     private void handlePhysicalKeyboardInput(KeyEvent event) {
         if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
             handleEnterButton(); // Submit guess
@@ -155,8 +125,10 @@ public class WordleGame {
         }
     }
 
-    /*
-        Handles different keys on virtual keyboard of our GUI.
+    /**
+     * Handles button presses on the virtual keyboard.
+     * 
+     * @param event The ActionEvent representing the button press.
      */
     @FXML
     private void handleKeyboardButton(ActionEvent event) {
@@ -171,17 +143,22 @@ public class WordleGame {
         }
     }
 
-		/*
-		 Handle letters specifically
-	 */
-	private void handleLetterKey(String text) {
-		if (lCol < 5) {
-			labels[lRow][lCol].setText(text);
-			characters.add(text.charAt(0)); // Store character
-			lCol++;
-		}
-	}
+    /**
+     * Handles letter key presses.
+     * 
+     * @param text The letter key pressed.
+     */
+    private void handleLetterKey(String text) {
+        if (lCol < 5) {
+            labels[lRow][lCol].setText(text);
+            characters.add(text.charAt(0)); // Store character
+            lCol++;
+        }
+    }
 
+    /**
+     * Handles backspace key presses.
+     */
     private void handleBackButton() {
         if (lCol > 0) {
             lCol--;
@@ -190,6 +167,9 @@ public class WordleGame {
         }
     }
 
+    /**
+     * Handles enter key presses.
+     */
     private void handleEnterButton() {
         if (lCol == 5) {
             String word = getWordFromLabel().toUpperCase(); // Ensure uppercase comparison
@@ -204,13 +184,30 @@ public class WordleGame {
         }
     }
 
-	private String getWordFromLabel() {
-		StringBuilder word = new StringBuilder();
-		for (int i = 0; i < 5; i++) {
-			word.append(labels[lRow][i].getText());
-		}
-		return word.toString();
-	}/**
+    /**
+     * Retrieves the word from the labels in the current row.
+     * 
+     * @return The word formed by the letters in the current row.
+     */
+    private String getWordFromLabel() {
+        StringBuilder word = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            word.append(labels[lRow][i].getText());
+        }
+        return word.toString();
+    }
+
+    /**
+     * Checks if the specified word is valid by looking it up in the dictionary.
+     * 
+     * @param word The word to check.
+     * @return True if the word is valid, false otherwise.
+     */
+    public boolean isValidWord(String word) {
+        return vocabulary.contains(word);
+    }
+
+    /**
      * Provides feedback on the guessed word by comparing it to the reference word.
      * Each letter in the guessed word is checked against the corresponding letter
      * in the reference word and is styled accordingly:
@@ -222,7 +219,6 @@ public class WordleGame {
      */
     public void giveFeedbackOnWord(String word) {
         LetterStatus[] feedback = LetterStatus.getFeedback(word, referenceWord);
-        makeGuess(word);
         // Apply styles based on feedback
         for (int i = 0; i < 5; i++) {
             LetterStatus.Status status = feedback[i].getStatus();
@@ -247,6 +243,9 @@ public class WordleGame {
         }
     }
 
+    /**
+     * Disables input from both the physical and virtual keyboards.
+     */
     private void disableInput() {
         rootPane.setOnKeyPressed(null);
         keyboardBox.getChildren().forEach(node -> {
@@ -276,21 +275,19 @@ public class WordleGame {
                 });
     }
 
+    /**
+     * Created by Mathias G
+     * This launches the secondary window pop-up to display a user's stats
+     * @param actionEvent actionEvent is when the View Stats button is clicked
+     * @throws IOException Exception thrown if fxml issues occur and file can't be loaded
+     */
+    public void viewStats(ActionEvent actionEvent) throws IOException {
+        Parent stats = FXMLLoader.load(getClass().getResource("Stats_Display.fxml"));
+        Scene scene = new Scene(stats);
+        Stage stage = new Stage();
 
-	/**
-	 * Created by Mathias G
-	 * This launches the secondary window pop-up to display a user's stats
-	 * @param actionEvent actionEvent is when the View Stats button is clicked
-	 * @throws IOException Exception thrown if fxml issues occur and file can't be loaded
-	 */
-	public void viewStats(ActionEvent actionEvent) throws IOException {
-		Parent stats = FXMLLoader.load(getClass().getResource("Stats_Display.fxml"));
-		Scene scene = new Scene(stats);
-		Stage stage = new Stage();
-
-
-		stage.setScene(scene);
-		stage.setTitle("User Stats");
-		stage.show();
-	}
+        stage.setScene(scene);
+        stage.setTitle("User Stats");
+        stage.show();
+    }
 }
