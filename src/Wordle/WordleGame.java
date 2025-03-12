@@ -40,6 +40,9 @@ public class WordleGame {
     @FXML
     public VBox keyboardBox;
 
+    @FXML
+    public Button enterButton;
+
     public Label guess_display;
 
     private List<Guess> guesses;
@@ -114,7 +117,7 @@ public class WordleGame {
      */
     private void handlePhysicalKeyboardInput(KeyEvent event) {
         if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
-            handleEnterButton(); // Submit guess
+            enterButton.fire(); // Simulate Enter button press
         } else if (event.getCode() == javafx.scene.input.KeyCode.BACK_SPACE) {
             handleBackButton(); // Delete letter
         } else {
@@ -288,6 +291,22 @@ public class WordleGame {
 
         stage.setScene(scene);
         stage.setTitle("User Stats");
+        stage.setOnHidden(e -> requestFocusOnRootPane()); // Request focus on rootPane when window is closed
         stage.show();
+    }
+
+    public void adminSettings(ActionEvent actionEvent) throws IOException {
+        Parent adminSetting = FXMLLoader.load(getClass().getResource("AdminSettings.fxml"));
+        Scene scene = new Scene(adminSetting);
+        Stage stage = new Stage();
+
+        stage.setScene(scene);
+        stage.setTitle("Admin Settings");
+        stage.setOnHidden(e -> requestFocusOnRootPane()); // Request focus on rootPane when window is closed
+        stage.show();
+    }
+    //this method to request focus on the rootPane
+    private void requestFocusOnRootPane() {
+        Platform.runLater(() -> rootPane.requestFocus());
     }
 }
