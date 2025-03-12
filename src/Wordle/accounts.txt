@@ -1,0 +1,6 @@
+Admin 123 Admin
+piece pieces RegularUser
+IronMan123 ironrod RegularUser
+SpiderMan MJ RegularUser
+edison bulb RegularUser
+singer sing RegularUser
