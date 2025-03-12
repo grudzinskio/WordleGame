@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="600.0" prefWidth="500.0" style="-fx-background-color: #1a1a1a;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.LoginController">
+   <children>
+      <VBox alignment="CENTER" prefHeight="673.0" prefWidth="500.0" spacing="40.0" style="-fx-background-color: #121213; -fx-background-radius: 20; -fx-padding: 40; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0.5, 0.0, 0.0);">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="WORDLE">
+               <font>
+                  <Font name="Segoe UI Bold" size="61.0" />
+               </font>
+               <fill>
+                  <LinearGradient endX="1.0" endY="1.0">
+                     <stops>
+                        <Stop color="#6aaa64" />
+                        <Stop color="#3a7d3f" offset="1.0" />
+                     </stops>
+                  </LinearGradient>
+               </fill>
+               <effect>
+                  <DropShadow offsetX="2.0" offsetY="2.0">
+                     <color>
+                        <Color red="0.2368421107530594" green="0.2368421107530594" blue="0.2368421107530594" />
+                     </color>
+                  </DropShadow>
+               </effect>
+            </Text>
+
+            <VBox spacing="5.0">
+               <Label text="Username" textFill="WHITE">
+                  <font>
+                     <Font name="Segoe UI Bold" size="15.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="usernameField" promptText="IronMan" style="-fx-background-color: #1a1a1a; -fx-border-color: #3a3a3a; -fx-border-radius: 8; -fx-text-fill: white; -fx-prompt-text-fill: #8c8c8c; -fx-padding: 15;">
+                  <font>
+                     <Font size="15.0" />
+                  </font>
+               </TextField>
+            </VBox>
+
+            <VBox spacing="5.0">
+               <Label text="Password" textFill="WHITE">
+                  <font>
+                     <Font name="Segoe UI Bold" size="15.0" />
+                  </font>
+               </Label>
+               <PasswordField fx:id="passwordField" promptText="IronRod" style="-fx-background-color: #1a1a1a; -fx-border-color: #3a3a3a; -fx-border-radius: 8; -fx-text-fill: white; -fx-prompt-text-fill: #8c8c8c; -fx-padding: 15;">
+                  <font>
+                     <Font size="15.0" />
+                  </font>
+               </PasswordField>
+            </VBox>
+
+            <VBox alignment="CENTER_LEFT" prefWidth="300.0" spacing="20.0" />
+
+            <VBox alignment="CENTER" prefWidth="300.0" spacing="15.0">
+               <Button onAction="#handleSignUp" prefHeight="50.0" prefWidth="172.0" style="-fx-background-color: #6aaa64; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 1.1em; -fx-padding: 15; -fx-background-radius: 8; -fx-cursor: hand;" text="Sign Up">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font></Button>
+               <Button onAction="#handleLogin" prefHeight="51.0" prefWidth="169.0" style="-fx-background-color: transparent; -fx-border-color: #6aaa64; -fx-text-fill: #6aaa64; -fx-font-weight: bold; -fx-font-size: 1.1em; -fx-padding: 15; -fx-border-radius: 8; -fx-cursor: hand;" text="Login" />
+            </VBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
