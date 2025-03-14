@@ -8,6 +8,7 @@
 package Wordle;
 
 import javafx.event.Event;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,17 +18,22 @@ import java.util.Map;
  * Tracks individual stats for players
  */
 public class UserStats implements Observer {
-	private static final UserStats instance = new UserStats();
+	private static UserStats instance;
 
 	private Map<String, Integer> commonLetters = new HashMap(26);
+	private Map<String, Integer> commonWords = new HashMap();
 	private Map date;
+	private String username;
 	private int guessCount;
 	private double avgGuess;
 	private int games;
 
-	public UserStats(){
+	public UserStats(String username){
 		initCommonLetters();
-
+		this.username = username;
+	}
+	public static void setInstance(String username) {
+		instance = new UserStats(username);
 	}
 
 	public static UserStats getInstance() {
@@ -95,7 +101,29 @@ public class UserStats implements Observer {
 
 	}
 
-	public double getGamesCount() {
+	public int getGamesCount() {
 		return games;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public Map<String, Integer> getLetterFrequencies() {
+		return commonLetters;
+	}
+
+	public Map<String, Integer> getWordFrequencies() {
+		return commonWords;
+	}
+
+	public void incrementGameCount(int gamesPlayed) {
+	}
+
+	public void updateLetterFrequency(String letterFrequencies) {
+
+	}
+
+	public void updateWordFrequency(String wordFrequencies) {
 	}
 }

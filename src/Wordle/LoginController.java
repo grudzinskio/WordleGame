@@ -53,6 +53,7 @@ public class LoginController {
 
         if (authenticateUser(username, password)) {
             showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
+            UserStats.setInstance(username);
             switchToWordleGame();
         } else {
             showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid username or password.");
