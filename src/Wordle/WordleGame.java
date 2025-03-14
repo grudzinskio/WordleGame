@@ -241,6 +241,7 @@ public class WordleGame {
             }
         }
         if (checkWin(word)) {
+            UserStatisticsDAO.saveUserStatistics(userStats);
             disableInput();
             System.out.println("You guessed the word correctly!");
         }
