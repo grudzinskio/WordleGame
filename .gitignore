@@ -1,4 +1,6 @@
 ## Java git ifnore
+#ignore maifest
+*.MF
 # Compiled class file
 *.class
 # Log file
