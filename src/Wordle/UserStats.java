@@ -11,6 +11,7 @@ import javafx.event.Event;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONObject;
 
 /**
  * UserStats class
