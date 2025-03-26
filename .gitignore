@@ -1,4 +1,6 @@
 ## Java git ifnore
+*.txt
+*.sqlite
 #ignore maifest
 *.MF
 # Compiled class file

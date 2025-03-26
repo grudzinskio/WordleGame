@@ -52,7 +52,7 @@
                         <Button layoutX="415.0" layoutY="16.0" mnemonicParsing="false" onAction="#handleKeyboardButton" prefHeight="50.0" prefWidth="50.0" styleClass="key" stylesheets="@style.css" text="N" />
                         <Button layoutX="442.0" layoutY="16.0" mnemonicParsing="false" onAction="#handleKeyboardButton" prefHeight="50.0" prefWidth="50.0" styleClass="key" stylesheets="@style.css" text="M" />
                         <Button layoutX="470.0" layoutY="16.0" mnemonicParsing="false" onAction="#handleKeyboardButton" prefHeight="50.0" prefWidth="80.0" styleClass="key" stylesheets="@style.css" text="BACK" />
-                        <Button fx:id="hintButton" onAction="#requestHint" text="Hint" styleClass="key" prefHeight="50.0" prefWidth="80.0" />
+                        <Button fx:id="hintButton" focusTraversable="false" onAction="#requestHint" prefHeight="50.0" prefWidth="80.0" styleClass="key" text="Hint" />
                     </children>
                 </HBox>
             </children>
@@ -120,12 +120,9 @@
             </Label>
          </children>
       </HBox>
-      <Button layoutX="23.0" layoutY="22.0" mnemonicParsing="false" onAction="#viewStats" styleClass="key" text="View Stats" />
-      <Button layoutX="14.0" layoutY="71.0" mnemonicParsing="false" onAction="#adminSettings" prefHeight="36.0" prefWidth="142.0" styleClass="key" text="Admin Settings" />
-        <Button fx:id="restartButton" layoutX="451.0" layoutY="316.0"
-                mnemonicParsing="false" onAction="#handleRestart"
-                prefHeight="36.0" prefWidth="107.0"
-                text="New Game" visible="false"
-                styleClass="key" />
+      <Button focusTraversable="false" layoutX="23.0" layoutY="22.0" mnemonicParsing="false" onAction="#viewStats" styleClass="key" text="View Stats" />
+      <Button focusTraversable="false" layoutX="14.0" layoutY="71.0" mnemonicParsing="false" onAction="#adminSettings" prefHeight="36.0" prefWidth="142.0" styleClass="key" text="Admin Settings" />
+        <Button fx:id="restartButton" layoutX="451.0" layoutY="316.0" mnemonicParsing="false" onAction="#handleRestart" prefHeight="36.0" prefWidth="107.0" styleClass="key" text="New Game" visible="false" />
+      <Button focusTraversable="false" layoutX="14.0" layoutY="122.0" mnemonicParsing="false" onAction="#adminStats" prefHeight="36.0" prefWidth="115.0" styleClass="key" text="Admin Stats" />
     </children>
 </AnchorPane>
