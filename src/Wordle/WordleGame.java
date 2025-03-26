@@ -16,7 +16,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,11 +47,13 @@ public class WordleGame {
 
     public Label guess_display;
 
-    private List<Guess> guesses;
-    private int maxGuesses;
-    public String referenceWord = "ALLOW"; // Example reference word
+    @FXML
+    private Button restartButton;
+
+    public String referenceWord;
     private UserStats userStats;
-    private Vocabulary vocabulary;
+    private final Vocabulary vocabulary = new Vocabulary();
+    private StatDisplayController instance = new StatDisplayController();
     public Label[][] labels;
     public int lRow = 0;
     public int lCol = 0;
@@ -65,8 +66,7 @@ public class WordleGame {
     public boolean[][] hintCells = new boolean[6][5]; // Tracks cells filled by hints.
 
     public WordleGame() {
-        vocabulary = new Vocabulary();
-        vocabulary.loadWords("src/Wordle/wordle-official-1.txt"); // Load dictionary words
+        vocabulary.loadWords("src/Wordle/wordle-full-1.txt"); // Load dictionary words
     }
 
     /**
@@ -85,10 +85,14 @@ public class WordleGame {
      */
     @FXML
     public void initialize() {
+        referenceWord = vocabulary.getRandomWord().toUpperCase();
+        System.out.println("Word is: " + referenceWord);
         userStats = UserStats.getInstance();
         userStats.updateGamesCount();
 
         populateLabels();
+
+        restartButton.setVisible(false);
 
         // Ensure rootPane has focus to capture key events
         Platform.runLater(() -> rootPane.requestFocus());
@@ -200,10 +204,24 @@ public class WordleGame {
         if (lCol == 5) {
             String word = getWordFromLabel().toUpperCase(); // Ensure uppercase comparison
             if (isValidWord(word.toLowerCase())) {
+                userStats.updateStats(word);
                 giveFeedbackOnWord(word);
                 lRow++;
                 lCol = 0;
                 characters.clear(); // Clear for next word
+
+                // Update guess display
+                guess_display.setText(String.valueOf(6 - lRow));
+
+                // If this was the last row and game not won, count as loss
+                if (lRow == 6 && !checkWin(word)) {
+                    userStats.updateGamesCount();
+                    restartButton.setVisible(true);
+                    disableInput();
+                    if (StatDisplayController.instance != null) {
+                        StatDisplayController.instance.refreshStats();
+                    }
+                }
             } else {
                 System.out.println("Word not in list.");
             }
@@ -267,10 +285,55 @@ public class WordleGame {
         UserStats.getInstance().updateStats(word);
 
         if (checkWin(word)) {
+            userStats.updateGamesCount();
+            restartButton.setVisible(true);
             UserStatisticsDAO.saveUserStatistics(userStats);
             disableInput();
             System.out.println("You guessed the word correctly!");
+
+            if (StatDisplayController.instance != null) {
+                StatDisplayController.instance.refreshStats();
+            }
         }
+    }
+
+    @FXML
+    private void handleRestart() {
+        lRow = 0;
+        lCol = 0;
+        characters.clear();
+
+        // Reset guess display
+        guess_display.setText("6");
+
+        // Clear grid
+        for (int r = 0; r < 6; r++) {
+            for (int c = 0; c < 5; c++) {
+                if (labels[r][c] != null) {
+                    labels[r][c].setText("");
+                    labels[r][c].setStyle(""); // reset styling
+                }
+            }
+        }
+
+        // Reset virtual keyboard
+        keyboardBox.lookupAll(".key").forEach(node -> {
+            if (node instanceof Button) {
+                node.setStyle(""); // remove custom style
+                node.setDisable(false); // re-enable key
+            }
+        });
+
+        // Choose new word
+        referenceWord = vocabulary.getRandomWord().toUpperCase();
+        System.out.println("New word: " + referenceWord);
+
+        // Hide restart button
+        restartButton.setVisible(false);
+
+        // Re-enable input
+        Platform.runLater(() -> rootPane.requestFocus());
+        rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
     }
 
     /**
