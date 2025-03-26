@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * The WordleGame class handles the game logic and user interactions for the Wordle game.
  * It manages the game state, validates user guesses, and provides feedback on the guessed words.
- * 
+ *
  * @version 1.0
  * @created 14-Feb-2025 1:31:10 PM
  */
@@ -43,20 +43,26 @@ public class WordleGame {
     @FXML
     public Button enterButton;
 
+    @FXML
+    public Button hintButton;
+
     public Label guess_display;
 
     private List<Guess> guesses;
     private int maxGuesses;
-    private String referenceWord = "ALLOW"; // Example reference word
+    public String referenceWord = "ALLOW"; // Example reference word
     private UserStats userStats;
     private Vocabulary vocabulary;
-    private Label[][] labels;
-    private int lRow = 0;
-    private int lCol = 0;
+    public Label[][] labels;
+    public int lRow = 0;
+    public int lCol = 0;
 
     // My implementation of handling input is keep a buffer of characters,
     // so we could manipulate this array for different keyboard input.
     private List<Character> characters = new ArrayList<>();
+    public int maxHints = 2;
+    public int hintsUsed = 0;
+    public boolean[][] hintCells = new boolean[6][5]; // Tracks cells filled by hints.
 
     public WordleGame() {
         vocabulary = new Vocabulary();
@@ -65,7 +71,7 @@ public class WordleGame {
 
     /**
      * Checks if the guessed word matches the reference word.
-     * 
+     *
      * @param word The guessed word.
      * @return True if the guessed word matches the reference word, false otherwise.
      */
@@ -99,6 +105,7 @@ public class WordleGame {
      */
     private void populateLabels() {
         labels = new Label[6][5];
+        hintCells = new boolean[6][5]; // All false by default.
         for (Node node : gridPane.getChildren()) {
             if (node instanceof Label) {
                 Integer row = GridPane.getRowIndex(node);
@@ -112,7 +119,7 @@ public class WordleGame {
 
     /**
      * Handles key presses from the physical keyboard.
-     * 
+     *
      * @param event The KeyEvent representing the key press.
      */
     private void handlePhysicalKeyboardInput(KeyEvent event) {
@@ -130,7 +137,7 @@ public class WordleGame {
 
     /**
      * Handles button presses on the virtual keyboard.
-     * 
+     *
      * @param event The ActionEvent representing the button press.
      */
     @FXML
@@ -148,14 +155,22 @@ public class WordleGame {
 
     /**
      * Handles letter key presses.
-     * 
+     *
      * @param text The letter key pressed.
      */
     private void handleLetterKey(String text) {
+        // Skip over any cells that are already marked as hints.
+        while (lCol < 5 && hintCells[lRow][lCol]) {
+            lCol++;
+        }
         if (lCol < 5) {
             labels[lRow][lCol].setText(text);
             characters.add(text.charAt(0)); // Store character
             lCol++;
+            // Skip over any additional hint cells that follow.
+            while (lCol < 5 && hintCells[lRow][lCol]) {
+                lCol++;
+            }
         }
     }
 
@@ -165,8 +180,16 @@ public class WordleGame {
     private void handleBackButton() {
         if (lCol > 0) {
             lCol--;
+            // Skip over any hint cells when moving back.
+            while (lCol > 0 && hintCells[lRow][lCol]) {
+                lCol--;
+            }
+            // Check if the current cell is a hint cell; if so, move back one more.
+            if (hintCells[lRow][lCol]) {
+                return;
+            }
             labels[lRow][lCol].setText("");
-            characters.remove(characters.size() - 1); // Remove last character
+            characters.remove(characters.size() - 1);
         }
     }
 
@@ -189,7 +212,7 @@ public class WordleGame {
 
     /**
      * Retrieves the word from the labels in the current row.
-     * 
+     *
      * @return The word formed by the letters in the current row.
      */
     private String getWordFromLabel() {
@@ -202,7 +225,7 @@ public class WordleGame {
 
     /**
      * Checks if the specified word is valid by looking it up in the dictionary.
-     * 
+     *
      * @param word The word to check.
      * @return True if the word is valid, false otherwise.
      */
@@ -280,15 +303,79 @@ public class WordleGame {
     }
 
     /**
-     * Created by Mathias G
-     * This launches the secondary window pop-up to display a user's stats
-     * @param actionEvent actionEvent is when the View Stats button is clicked
-     * @throws IOException Exception thrown if fxml issues occur and file can't be loaded
+     * Checks if the correct letter for the given column is already revealed
+     * in any previous row or in the current row.
+     *
+     * @param col The column index (0-4).
+     * @return True if the correct letter at position col is already shown.
      */
-    public void viewStats(ActionEvent actionEvent) throws IOException {
-        Parent stats = FXMLLoader.load(getClass().getResource("Stats_Display.fxml"));
-        Scene scene = new Scene(stats);
-        Stage stage = new Stage();
+    private boolean isLetterAlreadyRevealed(int col) {
+        String correctLetter = String.valueOf(referenceWord.charAt(col));
+        // Check all previous rows.
+        for (int r = 0; r < lRow; r++) {
+            if (labels[r][col].getText().equalsIgnoreCase(correctLetter)) {
+                return true;
+            }
+        }
+        // Also check the current row.
+        if (labels[lRow][col].getText().equalsIgnoreCase(correctLetter)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Provides a hint for the current guess by revealing one letter from the secret word
+     * in its correct position.
+     * 
+     * The method reveals one correct letter from {@code referenceWord} in its proper cell.
+     * If the user has already used the maximum number of hints allowed, the system will
+     * notify them that no more hints are available.
+     * The hint is selected by scanning from left-to-right and skipping any cell
+     * whose correct letter has already been revealed.
+     * The revealed letter is styled (blue background) so the user can clearly
+     * differentiate it from their normal guesses.
+     * 
+     */
+    public void requestHint() {
+        if (hintsUsed >= maxHints) {
+            System.out.println("No more hints available.");
+            return;
+        }
+        int hintIndex = -1;
+        for (int i = 0; i < 5; i++) {
+            // Skip cells if the correct letter for that column is already revealed.
+            if (isLetterAlreadyRevealed(i)) {
+                continue;
+            }
+            hintIndex = i;
+            break;
+        }
+        if (hintIndex == -1) {
+            System.out.println("No available cell for a hint in the current row.");
+            return;
+        }
+        // Get the correct letter from the secret word for the chosen cell.
+        char hintLetter = referenceWord.charAt(hintIndex);
+        labels[lRow][hintIndex].setText(String.valueOf(hintLetter));
+        labels[lRow][hintIndex].setStyle("-fx-background-color: blue; -fx-text-fill: white;");
+        hintCells[lRow][hintIndex] = true; // Mark this cell as uneditable by hint.
+        hintsUsed++;
+        if (hintsUsed >= maxHints) {
+            hintButton.setDisable(true);
+        }
+    }
+
+	/**
+	 * Created by Mathias G
+	 * This launches the secondary window pop-up to display a user's stats
+	 * @param actionEvent actionEvent is when the View Stats button is clicked
+	 * @throws IOException Exception thrown if fxml issues occur and file can't be loaded
+	 */
+	public void viewStats(ActionEvent actionEvent) throws IOException {
+		Parent stats = FXMLLoader.load(getClass().getResource("Stats_Display.fxml"));
+		Scene scene = new Scene(stats);
+		Stage stage = new Stage();
 
         stage.setScene(scene);
         stage.setTitle("User Stats");
