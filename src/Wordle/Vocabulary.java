@@ -48,4 +48,10 @@ public class Vocabulary {
     public boolean contains(String word) {
         return words.contains(word.toLowerCase());
     }
+
+    public String getRandomWord() {
+        if (words.isEmpty()) return "apple"; // Fallback if something goes wrong
+        int index = (int) (Math.random() * words.size());
+        return words.toArray(new String[0])[index];
+    }
 }

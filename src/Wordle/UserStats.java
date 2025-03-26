@@ -64,8 +64,8 @@ public class UserStats implements Observer {
 	}
 
 	public double getAverageGuesses(){
-		avgGuess = ((double) guessCount) /games;
-		return avgGuess;
+		if (games == 0) return 0.0;
+		return ((double) guessCount) / games;
 	}
 	
 	public void updateGamesCount() {
@@ -76,14 +76,12 @@ public class UserStats implements Observer {
 	 * @param guess word being guessed
 	 */
 	public void updateStats(String guess){
-		String[] letters = guess.toLowerCase().split("");
-
 		guessCount++;
-		for(String i : letters) {
-			int frequency = commonLetters.get(i);
-			frequency++;
 
-			commonLetters.put(i, frequency);
+		String[] letters = guess.toLowerCase().split("");
+		for(String i : letters) {
+			int frequency = commonLetters.getOrDefault(i, 0);
+			commonLetters.put(i, frequency + 1);
 		}
 	}
 
@@ -97,5 +95,9 @@ public class UserStats implements Observer {
 
 	public double getGamesCount() {
 		return games;
+	}
+
+	public int getGuessCount() {
+		return guessCount;
 	}
 }

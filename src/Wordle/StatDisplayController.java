@@ -9,13 +9,23 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
 public class StatDisplayController {
+    public static StatDisplayController instance;
+
     public TextField averageGuesses;
     public TextField gamesPlayed;
 
     @FXML
     private void initialize() {
+        instance = this;
+        refreshStats();
         UserStats userStats = UserStats.getInstance();
         averageGuesses.setText(String.valueOf(userStats.getAverageGuesses()));
+        gamesPlayed.setText(String.valueOf(userStats.getGamesCount()));
+    }
+
+    public void refreshStats() {
+        UserStats userStats = UserStats.getInstance();
+        averageGuesses.setText(String.format("%.2f", userStats.getAverageGuesses()));
         gamesPlayed.setText(String.valueOf(userStats.getGamesCount()));
     }
 }

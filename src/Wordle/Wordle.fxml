@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="rootPane" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="582.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleGame">
+<AnchorPane id="rootPane" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="582.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleGame">
     <children>
         <VBox fx:id="keyboardBox" alignment="BOTTOM_CENTER" layoutY="406.0" prefHeight="213.0" prefWidth="582.0" spacing="10.0">
             <children>
@@ -120,5 +120,10 @@
          </children>
       </HBox>
       <Button layoutX="23.0" layoutY="22.0" mnemonicParsing="false" onAction="#viewStats" styleClass="key" text="View Stats" />
+        <Button fx:id="restartButton" layoutX="451.0" layoutY="316.0"
+                mnemonicParsing="false" onAction="#handleRestart"
+                prefHeight="36.0" prefWidth="107.0"
+                text="New Game" visible="false"
+                styleClass="key" />
     </children>
 </AnchorPane>
