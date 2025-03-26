@@ -18,112 +18,131 @@ import java.util.Map;
  * Tracks individual stats for players
  */
 public class UserStats implements Observer {
-	private static UserStats instance;
+    private static UserStats instance;
 
-	private Map<String, Integer> commonLetters = new HashMap(26);
-	private Map<String, Integer> commonWords = new HashMap();
-	private Map date;
-	private String username;
-	private int guessCount;
-	private double avgGuess;
-	private int games;
+    private Map<String, Integer> commonLetters = new HashMap(26);
+    private Map<String, Integer> commonWords = new HashMap();
+    private Map date;
+    private String username;
+    int guessCount;
+    private double avgGuess;
+    private int games;
 
-	public UserStats(String username){
-		initCommonLetters();
-		this.username = username;
-	}
-	public static void setInstance(String username) {
-		instance = new UserStats(username);
-	}
+    public UserStats(String username) {
+        initCommonLetters();
+        this.username = username;
+    }
 
-	public static UserStats getInstance() {
-		return instance;
-	}
+    public static void setInstance(String username) {
+        instance = new UserStats(username);
+    }
 
-	private void initCommonLetters() {
-		commonLetters.put("a", 0);
-		commonLetters.put("b", 0);
-		commonLetters.put("c", 0);
-		commonLetters.put("d", 0);
-		commonLetters.put("e", 0);
-		commonLetters.put("f", 0);
-		commonLetters.put("g", 0);
-		commonLetters.put("h", 0);
-		commonLetters.put("i", 0);
-		commonLetters.put("j", 0);
-		commonLetters.put("k", 0);
-		commonLetters.put("l", 0);
-		commonLetters.put("m", 0);
-		commonLetters.put("n", 0);
-		commonLetters.put("o", 0);
-		commonLetters.put("p", 0);
-		commonLetters.put("q", 0);
-		commonLetters.put("r", 0);
-		commonLetters.put("s", 0);
-		commonLetters.put("t", 0);
-		commonLetters.put("u", 0);
-		commonLetters.put("v", 0);
-		commonLetters.put("w", 0);
-		commonLetters.put("x", 0);
-		commonLetters.put("y", 0);
-		commonLetters.put("z", 0);
-	}
+    public static UserStats getInstance() {
+        return instance;
+    }
 
-	public double getAverageGuesses(){
-		avgGuess = ((double) guessCount) /games;
-		return avgGuess;
-	}
-	
-	public void updateGamesCount() {
-		games++;
-	}
-	/**
-	 * updates user's stats based on inputted guess
-	 * @param guess word being guessed
-	 */
-	public void updateStats(String guess){
-		String[] letters = guess.toLowerCase().split("");
+    private void initCommonLetters() {
+        commonLetters.put("a", 0);
+        commonLetters.put("b", 0);
+        commonLetters.put("c", 0);
+        commonLetters.put("d", 0);
+        commonLetters.put("e", 0);
+        commonLetters.put("f", 0);
+        commonLetters.put("g", 0);
+        commonLetters.put("h", 0);
+        commonLetters.put("i", 0);
+        commonLetters.put("j", 0);
+        commonLetters.put("k", 0);
+        commonLetters.put("l", 0);
+        commonLetters.put("m", 0);
+        commonLetters.put("n", 0);
+        commonLetters.put("o", 0);
+        commonLetters.put("p", 0);
+        commonLetters.put("q", 0);
+        commonLetters.put("r", 0);
+        commonLetters.put("s", 0);
+        commonLetters.put("t", 0);
+        commonLetters.put("u", 0);
+        commonLetters.put("v", 0);
+        commonLetters.put("w", 0);
+        commonLetters.put("x", 0);
+        commonLetters.put("y", 0);
+        commonLetters.put("z", 0);
+    }
 
-		guessCount++;
-		for(String i : letters) {
-			int frequency = commonLetters.get(i);
-			frequency++;
+    public double getAverageGuesses() {
+        return games > 0 ? (double) guessCount / games : 0;
+    }
 
-			commonLetters.put(i, frequency);
-		}
-	}
+    public void updateGamesCount() {
+        games++;
+    }
 
-	/**
-	 * @param event
-	 */
-	@Override
-	public void update(Event event) {
+    /**
+     * updates user's stats based on inputted guess
+     *
+     * @param guess word being guessed
+     */
+    public void updateStats(String guess) {
+        String[] letters = guess.toLowerCase().split("");
 
-	}
+        guessCount++;
+        for (String letter : letters) {
+            int frequency = commonLetters.get(letter);
+            frequency++;
+            commonLetters.put(letter, frequency);
+        }
 
-	public int getGamesCount() {
-		return games;
-	}
+        int wordFrequency = commonWords.getOrDefault(guess, 0);
+        commonWords.put(guess, wordFrequency + 1);
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    /**
+     * @param event
+     */
+    @Override
+    public void update(Event event) {
 
-	public Map<String, Integer> getLetterFrequencies() {
-		return commonLetters;
-	}
+    }
 
-	public Map<String, Integer> getWordFrequencies() {
-		return commonWords;
-	}
+    public int getGamesCount() {
+        return games;
+    }
 
-	public void incrementGameCount(int gamesPlayed) {
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public void updateLetterFrequency(String letterFrequencies) {
+    public Map<String, Integer> getLetterFrequencies() {
+        return commonLetters;
+    }
 
-	}
+    public Map<String, Integer> getWordFrequencies() {
+        return commonWords;
+    }
 
-	public void updateWordFrequency(String wordFrequencies) {
-	}
+
+    public void incrementGameCount(int gamesPlayed) {
+        this.games += gamesPlayed;
+    }
+
+    public void updateLetterFrequency(String letterFrequencies) {
+        JSONObject json = new JSONObject(letterFrequencies);
+        for (String key : json.keySet()) {
+            int frequency = json.getInt(key);
+            commonLetters.put(key, commonLetters.getOrDefault(key, 0) + frequency);
+        }
+    }
+
+    public void updateWordFrequency(String wordFrequencies) {
+        JSONObject json = new JSONObject(wordFrequencies);
+        for (String key : json.keySet()) {
+            int frequency = json.getInt(key);
+            commonWords.put(key, commonWords.getOrDefault(key, 0) + frequency);
+        }
+    }
+
+    public int getGuessCount() {
+        return guessCount;
+    }
 }
