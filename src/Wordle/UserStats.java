@@ -83,14 +83,17 @@ public class UserStats implements Observer {
      * @param guess word being guessed
      */
     public void updateStats(String guess) {
-        String[] letters = guess.toLowerCase().split("");
-
         guessCount++;
-        for (String letter : letters) {
-            int frequency = commonLetters.getOrDefault(letter, 0);
-            commonLetters.put(letter, frequency);
+
+        // Update letter frequencies
+        for (char letter : guess.toCharArray()) {
+            if (Character.isLetter(letter)) {
+                String letterStr = String.valueOf(letter).toLowerCase();
+                commonLetters.put(letterStr, commonLetters.getOrDefault(letterStr, 0) + 1);
+            }
         }
 
+        // Update word frequency
         int wordFrequency = commonWords.getOrDefault(guess, 0);
         commonWords.put(guess, wordFrequency + 1);
     }
@@ -124,11 +127,12 @@ public class UserStats implements Observer {
         this.games += gamesPlayed;
     }
 
-    public void updateLetterFrequency(String letterFrequencies) {
-        JSONObject json = new JSONObject(letterFrequencies);
-        for (String key : json.keySet()) {
-            int frequency = json.getInt(key);
-            commonLetters.put(key, commonLetters.getOrDefault(key, 0) + frequency);
+    public void updateLetterFrequency(String guessedWord) {
+        for (char letter : guessedWord.toCharArray()) {
+            if (Character.isLetter(letter)) {
+                String letterStr = String.valueOf(letter).toUpperCase();
+                commonLetters.put(letterStr, commonLetters.getOrDefault(letterStr, 0) + 1);
+            }
         }
     }
 

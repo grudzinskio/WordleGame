@@ -281,13 +281,12 @@ public class WordleGame {
                     break;
             }
         }
-        // Update stats for the guessed word
-        UserStats.getInstance().updateStats(word);
 
         if (checkWin(word)) {
             userStats.updateGamesCount();
-            restartButton.setVisible(true);
             UserStatisticsDAO.saveUserStatistics(userStats);
+            restartButton.setVisible(true);
+
             disableInput();
             System.out.println("You guessed the word correctly!");
 
@@ -451,6 +450,17 @@ public class WordleGame {
 
     public void adminSettings(ActionEvent actionEvent) throws IOException {
         Parent adminSetting = FXMLLoader.load(getClass().getResource("AdminSettings.fxml"));
+        Scene scene = new Scene(adminSetting);
+        Stage stage = new Stage();
+
+        stage.setScene(scene);
+        stage.setTitle("Admin Settings");
+        stage.setOnHidden(e -> requestFocusOnRootPane()); // Request focus on rootPane when window is closed
+        stage.show();
+    }
+
+    public void adminStats(ActionEvent actionEvent) throws IOException {
+        Parent adminSetting = FXMLLoader.load(getClass().getResource("AdminStats.fxml"));
         Scene scene = new Scene(adminSetting);
         Stage stage = new Stage();
 
