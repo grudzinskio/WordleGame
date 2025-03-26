@@ -122,5 +122,10 @@
       </HBox>
       <Button layoutX="23.0" layoutY="22.0" mnemonicParsing="false" onAction="#viewStats" styleClass="key" text="View Stats" />
       <Button layoutX="14.0" layoutY="71.0" mnemonicParsing="false" onAction="#adminSettings" prefHeight="36.0" prefWidth="142.0" styleClass="key" text="Admin Settings" />
+        <Button fx:id="restartButton" layoutX="451.0" layoutY="316.0"
+                mnemonicParsing="false" onAction="#handleRestart"
+                prefHeight="36.0" prefWidth="107.0"
+                text="New Game" visible="false"
+                styleClass="key" />
     </children>
 </AnchorPane>

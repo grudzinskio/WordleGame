@@ -22,10 +22,8 @@ public class UserStats implements Observer {
 
     private Map<String, Integer> commonLetters = new HashMap(26);
     private Map<String, Integer> commonWords = new HashMap();
-    private Map date;
     private String username;
     int guessCount;
-    private double avgGuess;
     private int games;
 
     public UserStats(String username) {
@@ -71,7 +69,8 @@ public class UserStats implements Observer {
     }
 
     public double getAverageGuesses() {
-        return games > 0 ? (double) guessCount / games : 0;
+        if (games == 0) return 0.0;
+        return ((double) guessCount) / games;
     }
 
     public void updateGamesCount() {
@@ -88,8 +87,7 @@ public class UserStats implements Observer {
 
         guessCount++;
         for (String letter : letters) {
-            int frequency = commonLetters.get(letter);
-            frequency++;
+            int frequency = commonLetters.getOrDefault(letter, 0);
             commonLetters.put(letter, frequency);
         }
 
