@@ -240,6 +240,9 @@ public class WordleGame {
                     break;
             }
         }
+        // Update stats for the guessed word
+        UserStats.getInstance().updateStats(word);
+
         if (checkWin(word)) {
             UserStatisticsDAO.saveUserStatistics(userStats);
             disableInput();

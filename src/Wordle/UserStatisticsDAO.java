@@ -8,6 +8,18 @@ import org.json.JSONObject;
 
 public class UserStatisticsDAO {
     public static void saveUserStatistics(UserStats stats) {
+        UserStats existingStats = getUserStatistics(stats.getUsername());
+        if (existingStats != null) {
+            // Update existing stats with new data
+            stats.incrementGameCount(existingStats.getGamesCount());
+            stats.updateLetterFrequency(new JSONObject(existingStats.getLetterFrequencies()).toString());
+            stats.updateWordFrequency(new JSONObject(existingStats.getWordFrequencies()).toString());
+            stats.guessCount += existingStats.getGuessCount(); // Use getter method
+        }
+
+        // Calculate the average guesses
+        double averageGuesses = stats.getGamesCount() > 0 ? (double) stats.getGuessCount() / stats.getGamesCount() : 0;
+
         String query = "INSERT INTO user_statistics (username, games_played, average_guesses, letter_frequencies, word_frequencies) " +
                 "VALUES (?, ?, ?, ?, ?) " +
                 "ON CONFLICT(username) DO UPDATE SET games_played = excluded.games_played, " +
@@ -20,7 +32,7 @@ public class UserStatisticsDAO {
 
             pstmt.setString(1, stats.getUsername());
             pstmt.setInt(2, stats.getGamesCount());
-            pstmt.setDouble(3, stats.getAverageGuesses());
+            pstmt.setDouble(3, averageGuesses);
             pstmt.setString(4, new JSONObject(stats.getLetterFrequencies()).toString());
             pstmt.setString(5, new JSONObject(stats.getWordFrequencies()).toString());
 
@@ -29,6 +41,7 @@ public class UserStatisticsDAO {
             e.printStackTrace();
         }
     }
+
     public static UserStats getUserStatistics(String username) {
         String query = "SELECT * FROM user_statistics WHERE username = ?";
 
