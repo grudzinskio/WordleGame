@@ -59,7 +59,7 @@ public class WordleGame {
     private List<Character> characters = new ArrayList<>();
 
     public WordleGame() {
-        vocabulary = new Vocabulary();
+        vocabulary = Vocabulary.getVocabulary();
         vocabulary.loadWords("src/Wordle/wordle-official-1.txt"); // Load dictionary words
     }
 
