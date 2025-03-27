@@ -52,7 +52,7 @@ public class WordleGame {
 
     public String referenceWord;
     private UserStats userStats;
-    private final Vocabulary vocabulary = new Vocabulary();
+    private  Vocabulary vocabulary = new Vocabulary();
     private StatDisplayController instance = new StatDisplayController();
     public Label[][] labels;
     public int lRow = 0;
