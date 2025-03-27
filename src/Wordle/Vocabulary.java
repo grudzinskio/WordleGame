@@ -14,12 +14,19 @@ import java.util.Set;
  * @created 14-Feb-2025 1:31:08 PM
  */
 public class Vocabulary {
-
+    private static final Vocabulary vocabulary = new Vocabulary();
     private String filePath;
     private Set<String> words;
 
     public Vocabulary() {
         words = new HashSet<>();
+    }
+    public static Vocabulary getVocabulary() {
+        return vocabulary;
+    }
+
+    public String getFilePath() {
+        return filePath;
     }
 
     /**

@@ -66,7 +66,10 @@ public class WordleGame {
     public boolean[][] hintCells = new boolean[6][5]; // Tracks cells filled by hints.
 
     public WordleGame() {
-        vocabulary.loadWords("src/Wordle/wordle-full-1.txt"); // Load dictionary words
+
+        vocabulary = Vocabulary.getVocabulary();
+        vocabulary.loadWords("src/Wordle/wordle-official-1.txt"); // Load dictionary words
+
     }
 
     /**
