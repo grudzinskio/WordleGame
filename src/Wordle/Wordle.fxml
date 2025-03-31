@@ -2,6 +2,8 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -12,6 +14,26 @@
 
 <AnchorPane id="rootPane" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="582.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleGame">
     <children>
+      <ImageView fitHeight="38.0" fitWidth="38.0" layoutX="467.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@adminstats.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="36.0" fitWidth="37.0" layoutX="520.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@adminsettingsicon.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="73.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@hinticon.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="36.0" fitWidth="68.0" layoutX="25.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@statisicons.png" />
+         </image>
+      </ImageView>
         <VBox fx:id="keyboardBox" alignment="BOTTOM_CENTER" layoutY="406.0" prefHeight="213.0" prefWidth="582.0" spacing="10.0">
             <children>
                 <HBox alignment="CENTER" prefHeight="61.0" prefWidth="493.0" spacing="5.0">
@@ -52,7 +74,6 @@
                         <Button layoutX="415.0" layoutY="16.0" mnemonicParsing="false" onAction="#handleKeyboardButton" prefHeight="50.0" prefWidth="50.0" styleClass="key" stylesheets="@style.css" text="N" />
                         <Button layoutX="442.0" layoutY="16.0" mnemonicParsing="false" onAction="#handleKeyboardButton" prefHeight="50.0" prefWidth="50.0" styleClass="key" stylesheets="@style.css" text="M" />
                         <Button layoutX="470.0" layoutY="16.0" mnemonicParsing="false" onAction="#handleKeyboardButton" prefHeight="50.0" prefWidth="80.0" styleClass="key" stylesheets="@style.css" text="BACK" />
-                        <Button fx:id="hintButton" focusTraversable="false" onAction="#requestHint" prefHeight="50.0" prefWidth="80.0" styleClass="key" text="Hint" />
                     </children>
                 </HBox>
             </children>
@@ -120,9 +141,10 @@
             </Label>
          </children>
       </HBox>
-      <Button focusTraversable="false" layoutX="23.0" layoutY="22.0" mnemonicParsing="false" onAction="#viewStats" styleClass="key" text="View Stats" />
-      <Button focusTraversable="false" layoutX="14.0" layoutY="71.0" mnemonicParsing="false" onAction="#adminSettings" prefHeight="36.0" prefWidth="142.0" styleClass="key" text="Admin Settings" />
+      <Button focusTraversable="false" layoutX="25.0" layoutY="21.0" mnemonicParsing="false" onAction="#viewStats" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" />
+      <Button focusTraversable="false" layoutX="520.0" layoutY="21.0" mnemonicParsing="false" onAction="#adminSettings" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" />
         <Button fx:id="restartButton" layoutX="451.0" layoutY="316.0" mnemonicParsing="false" onAction="#handleRestart" prefHeight="36.0" prefWidth="107.0" styleClass="key" text="New Game" visible="false" />
-      <Button focusTraversable="false" layoutX="14.0" layoutY="122.0" mnemonicParsing="false" onAction="#adminStats" prefHeight="36.0" prefWidth="115.0" styleClass="key" text="Admin Stats" />
+      <Button focusTraversable="false" layoutX="467.0" layoutY="20.0" mnemonicParsing="false" onAction="#adminStats" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" />
+            <Button fx:id="hintButton" focusTraversable="false" layoutX="73.0" layoutY="21.0" onAction="#requestHint" opacity="0.06" prefHeight="36.0" prefWidth="37.0" styleClass="key" />
     </children>
 </AnchorPane>
