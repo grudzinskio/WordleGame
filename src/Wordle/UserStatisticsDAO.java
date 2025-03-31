@@ -12,20 +12,36 @@ import java.util.Map;
 import org.json.JSONObject;
 
 public class UserStatisticsDAO {
+    // Java
     public static void saveUserStatistics(UserStats stats) {
         UserStats existingStats = getUserStatistics(stats.getUsername());
+        int newGameCount;
+
         if (existingStats != null) {
-            stats.incrementGameCount(existingStats.getGamesCount());
+            // Increment games played by one
+            newGameCount = existingStats.getGamesCount() + 1;
+            // Merge frequencies (this assumes your update methods merge the JSON values)
             stats.updateLetterFrequency(new JSONObject(existingStats.getLetterFrequencies()).toString());
             stats.updateWordFrequency(new JSONObject(existingStats.getWordFrequencies()).toString());
+            // Merge guess count so that average is computed correctly
             stats.guessCount += existingStats.getGuessCount();
+        } else {
+            newGameCount = 1;
         }
 
-        double averageGuesses = stats.getGamesCount() > 0 ? (double) stats.getGuessCount() / stats.getGamesCount() : 0;
+        // Calculate total word count by summing frequencies from word_frequencies map
+        int totalWordCount = 0;
+        for (int count : stats.getWordFrequencies().values()) {
+            totalWordCount += count;
+        }
+
+        // Calculate average guesses as total words count divided by new game count
+        double averageGuesses = newGameCount > 0 ? (double) totalWordCount / newGameCount : 0;
 
         String query = "INSERT INTO user_statistics (username, games_played, average_guesses, letter_frequencies, word_frequencies) " +
                 "VALUES (?, ?, ?, ?, ?) " +
-                "ON CONFLICT(username) DO UPDATE SET games_played = excluded.games_played, " +
+                "ON CONFLICT(username) DO UPDATE SET " +
+                "games_played = excluded.games_played, " +
                 "average_guesses = excluded.average_guesses, " +
                 "letter_frequencies = excluded.letter_frequencies, " +
                 "word_frequencies = excluded.word_frequencies;";
@@ -34,7 +50,7 @@ public class UserStatisticsDAO {
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, stats.getUsername());
-            pstmt.setInt(2, stats.getGamesCount());
+            pstmt.setInt(2, newGameCount);
             pstmt.setDouble(3, averageGuesses);
             pstmt.setString(4, new JSONObject(stats.getLetterFrequencies()).toString());
             pstmt.setString(5, new JSONObject(stats.getWordFrequencies()).toString());
