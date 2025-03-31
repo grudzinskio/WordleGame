@@ -83,6 +83,8 @@ public class UserStatisticsDAO {
         }
         return null;
     }
+
+
     public static Map<String, Integer> getLetterFrequencies() {
         Map<String, Integer> letterFrequencies = new HashMap<>();
         String query = "SELECT letter_frequencies FROM user_statistics";
