@@ -73,9 +73,9 @@ public class UserStats implements Observer {
         return ((double) guessCount) / games;
     }
 
-    public void updateGamesCount() {
-        games++;
-    }
+//    public void updateGamesCount() {
+//        games++;
+//    }
 
     /**
      * updates user's stats based on inputted guess
@@ -130,7 +130,7 @@ public class UserStats implements Observer {
     public void updateLetterFrequency(String guessedWord) {
         for (char letter : guessedWord.toCharArray()) {
             if (Character.isLetter(letter)) {
-                String letterStr = String.valueOf(letter).toUpperCase();
+                String letterStr = String.valueOf(letter).toLowerCase();
                 commonLetters.put(letterStr, commonLetters.getOrDefault(letterStr, 0) + 1);
             }
         }
@@ -142,6 +142,14 @@ public class UserStats implements Observer {
             int frequency = json.getInt(key);
             commonWords.put(key, commonWords.getOrDefault(key, 0) + frequency);
         }
+    }
+
+    public void resetStats() {
+        commonLetters.clear();
+        commonWords.clear();
+        guessCount = 0;
+        games = 0;
+        initCommonLetters();
     }
 
     public int getGuessCount() {

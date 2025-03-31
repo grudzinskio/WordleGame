@@ -91,7 +91,6 @@ public class WordleGame {
         referenceWord = vocabulary.getRandomWord().toUpperCase();
         System.out.println("Word is: " + referenceWord);
         userStats = UserStats.getInstance();
-        userStats.updateGamesCount();
 
         populateLabels();
 
@@ -218,7 +217,7 @@ public class WordleGame {
 
                 // If this was the last row and game not won, count as loss
                 if (lRow == 6 && !checkWin(word)) {
-                    userStats.updateGamesCount();
+                    //userStats.updateGamesCount();
                     restartButton.setVisible(true);
                     disableInput();
                     if (StatDisplayController.instance != null) {
@@ -286,7 +285,7 @@ public class WordleGame {
         }
 
         if (checkWin(word)) {
-            userStats.updateGamesCount();
+            //userStats.updateGamesCount();
             UserStatisticsDAO.saveUserStatistics(userStats);
             restartButton.setVisible(true);
 
@@ -336,6 +335,8 @@ public class WordleGame {
         // Re-enable input
         Platform.runLater(() -> rootPane.requestFocus());
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
+        userStats.resetStats();
+
     }
 
     /**
