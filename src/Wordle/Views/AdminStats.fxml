@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="Wordle.AdminStatsController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="Wordle.Controllers.AdminStatsController">
     <VBox prefWidth="553.0">
       <HBox prefHeight="20.0" prefWidth="200.0">
          <children>
