@@ -306,17 +306,20 @@ public class WordleGame {
         lRow = 0;
         lCol = 0;
         characters.clear();
+        hintsUsed = 0;                      
+        hintButton.setDisable(false);       // Re-enable the hint button
 
         // Reset guess display
         guess_display.setText("6");
 
-        // Clear grid
+        // Clear grid and reset hintCells for every cell
         for (int r = 0; r < 6; r++) {
             for (int c = 0; c < 5; c++) {
                 if (labels[r][c] != null) {
                     labels[r][c].setText("");
                     labels[r][c].setStyle(""); // reset styling
                 }
+                hintCells[r][c] = false;    // Reset hint marker for cell
             }
         }
 
@@ -339,7 +342,6 @@ public class WordleGame {
         Platform.runLater(() -> rootPane.requestFocus());
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
         userStats.resetStats();
-
     }
 
     /**
