@@ -1,4 +1,5 @@
-package Wordle;
+package Wordle.Controllers;
+import Wordle.Statistics.UserStatisticsDAO;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 
