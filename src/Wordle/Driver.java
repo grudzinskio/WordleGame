@@ -14,7 +14,7 @@ public class Driver extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("Login.fxml"));
+        loader.setLocation(getClass().getResource("Views/Login.fxml"));
         Pane root = loader.load();
         stage.setTitle("Wordle Login");
         stage.setScene(new Scene(root));

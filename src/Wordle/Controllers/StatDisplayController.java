@@ -1,6 +1,8 @@
 // Java
-package Wordle;
+package Wordle.Controllers;
 
+import Wordle.DatabaseManager;
+import Wordle.Statistics.UserStats;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 

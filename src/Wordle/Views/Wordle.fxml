@@ -16,22 +16,22 @@
     <children>
       <ImageView fitHeight="38.0" fitWidth="38.0" layoutX="467.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@adminstats.png" />
+            <Image url="@../Assets/adminstats.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="36.0" fitWidth="37.0" layoutX="520.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@adminsettingsicon.png" />
+            <Image url="@../Assets/adminsettingsicon.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="39.0" fitWidth="39.0" layoutX="73.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@hinticon.png" />
+            <Image url="@../Assets/hinticon.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="36.0" fitWidth="68.0" layoutX="25.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@statisicons.png" />
+            <Image url="@../Assets/statisicons.png" />
          </image>
       </ImageView>
         <VBox fx:id="keyboardBox" alignment="BOTTOM_CENTER" layoutY="406.0" prefHeight="213.0" prefWidth="582.0" spacing="10.0">

@@ -1,5 +1,8 @@
 package Wordle;
 
+import Wordle.Controllers.StatDisplayController;
+import Wordle.Statistics.UserStatisticsDAO;
+import Wordle.Statistics.UserStats;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -68,7 +71,7 @@ public class WordleGame {
     public WordleGame() {
 
         vocabulary = Vocabulary.getVocabulary();
-        vocabulary.loadWords("src/Wordle/wordle-official-1.txt"); // Load dictionary words
+        vocabulary.loadWords("repository/wordle-official-1.txt"); // Load dictionary words
 
     }
 
@@ -442,7 +445,7 @@ public class WordleGame {
 	 * @throws IOException Exception thrown if fxml issues occur and file can't be loaded
 	 */
 	public void viewStats(ActionEvent actionEvent) throws IOException {
-		Parent stats = FXMLLoader.load(getClass().getResource("Stats_Display.fxml"));
+		Parent stats = FXMLLoader.load(getClass().getResource("Views/Stats_Display.fxml"));
 		Scene scene = new Scene(stats);
 		Stage stage = new Stage();
 
@@ -453,7 +456,7 @@ public class WordleGame {
     }
 
     public void adminSettings(ActionEvent actionEvent) throws IOException {
-        Parent adminSetting = FXMLLoader.load(getClass().getResource("AdminSettings.fxml"));
+        Parent adminSetting = FXMLLoader.load(getClass().getResource("Views/AdminSettings.fxml"));
         Scene scene = new Scene(adminSetting);
         Stage stage = new Stage();
 
@@ -464,7 +467,7 @@ public class WordleGame {
     }
 
     public void adminStats(ActionEvent actionEvent) throws IOException {
-        Parent adminSetting = FXMLLoader.load(getClass().getResource("AdminStats.fxml"));
+        Parent adminSetting = FXMLLoader.load(getClass().getResource("Views/AdminStats.fxml"));
         Scene scene = new Scene(adminSetting);
         Stage stage = new Stage();
 

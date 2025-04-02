@@ -1,4 +1,4 @@
-package Wordle;
+package Wordle.Statistics;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import Wordle.DatabaseManager;
 import org.json.JSONObject;
 
 public class UserStatisticsDAO {
