@@ -1,10 +1,1 @@
-Admin 123 Admin
-piece pieces RegularUser
-IronMan123 ironrod RegularUser
-SpiderMan MJ RegularUser
-edison bulb RegularUser
-singer sing RegularUser
-bob beepboop RegularUser
-test test RegularUser
-teset test RegularUser
-fred 21 RegularUser
+ollie 123 RegularUser

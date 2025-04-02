@@ -31,7 +31,7 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
-    private static final String DATABASE_FILE = "src/Wordle/accounts.txt";
+    private static final String DATABASE_FILE = "data/accounts.txt";
 
     /**
      * Handles the login button press.
