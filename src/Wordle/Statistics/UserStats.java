@@ -5,9 +5,7 @@
  * @created 14-Feb-2025 1:31:07 PM
  */
 
-package Wordle;
-
-import javafx.event.Event;
+package Wordle.Statistics;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +15,7 @@ import org.json.JSONObject;
  * UserStats class
  * Tracks individual stats for players
  */
-public class UserStats implements Observer {
+public class UserStats{
     private static UserStats instance;
 
     private Map<String, Integer> commonLetters = new HashMap(26);
@@ -98,13 +96,6 @@ public class UserStats implements Observer {
         commonWords.put(guess, wordFrequency + 1);
     }
 
-    /**
-     * @param event
-     */
-    @Override
-    public void update(Event event) {
-
-    }
 
     public int getGamesCount() {
         return games;

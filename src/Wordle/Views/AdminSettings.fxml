@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.AdminController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.Controllers.AdminController">
    <children>
       <Button layoutX="14.0" layoutY="81.0" mnemonicParsing="false" onAction="#changeFile" prefHeight="36.0" prefWidth="163.0" styleClass="key" text="Change Vocab File" />
       <Label layoutX="14.0" layoutY="14.0" minHeight="39.0" prefHeight="50.0" prefWidth="163.0" styleClass="word-cell" text="Current File:" textFill="WHITE" />

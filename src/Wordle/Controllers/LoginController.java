@@ -1,5 +1,6 @@
-package Wordle;
+package Wordle.Controllers;
 
+import Wordle.Statistics.UserStats;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -31,7 +32,7 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
-    private static final String DATABASE_FILE = "src/Wordle/accounts.txt";
+    private static final String DATABASE_FILE = "repository/accounts.txt";
 
     /**
      * Handles the login button press.
@@ -155,7 +156,8 @@ public class LoginController {
      */
     private void switchToWordleGame() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Wordle.fxml"));
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Wordle/Views/Wordle.fxml"));
             Pane root = loader.load();
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
