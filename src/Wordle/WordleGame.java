@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import javafx.scene.input.KeyEvent;
@@ -32,7 +33,14 @@ import java.util.List;
  * @created 14-Feb-2025 1:31:10 PM
  */
 public class WordleGame {
-
+    @FXML
+    private ImageView adminSettingIcon;
+    @FXML
+    private ImageView adminStatsIcon;
+    @FXML
+    private Button adminSettingsButton;
+    @FXML
+    private Button adminStatsButton;
     @FXML
     private AnchorPane rootPane;
 
@@ -91,6 +99,13 @@ public class WordleGame {
      */
     @FXML
     public void initialize() {
+        userStats = UserStats.getInstance();
+        if (userStats.getUsername().equals("Admin")) {
+            adminSettingsButton.setVisible(true);
+            adminSettingIcon.setVisible(true);
+            adminStatsButton.setVisible(true);
+            adminStatsIcon.setVisible(true);
+        }
         referenceWord = vocabulary.getRandomWord().toUpperCase();
         System.out.println("Word is: " + referenceWord);
         userStats = UserStats.getInstance();
@@ -220,7 +235,7 @@ public class WordleGame {
 
                 // If this was the last row and game not won, count as loss
                 if (lRow == 6 && !checkWin(word)) {
-                    //userStats.updateGamesCount();
+                    UserStatisticsDAO.saveUserStatistics(userStats);
                     restartButton.setVisible(true);
                     disableInput();
                     if (StatDisplayController.instance != null) {
@@ -306,7 +321,7 @@ public class WordleGame {
         lRow = 0;
         lCol = 0;
         characters.clear();
-        hintsUsed = 0;                      
+        hintsUsed = 0;
         hintButton.setDisable(false);       // Re-enable the hint button
 
         // Reset guess display
@@ -401,7 +416,7 @@ public class WordleGame {
     /**
      * Provides a hint for the current guess by revealing one letter from the secret word
      * in its correct position.
-     * 
+     *
      * The method reveals one correct letter from {@code referenceWord} in its proper cell.
      * If the user has already used the maximum number of hints allowed, the system will
      * notify them that no more hints are available.
@@ -409,7 +424,7 @@ public class WordleGame {
      * whose correct letter has already been revealed.
      * The revealed letter is styled (blue background) so the user can clearly
      * differentiate it from their normal guesses.
-     * 
+     *
      */
     public void requestHint() {
         if (hintsUsed >= maxHints) {

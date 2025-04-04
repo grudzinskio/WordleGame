@@ -14,12 +14,12 @@
 
 <AnchorPane id="rootPane" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="582.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleGame">
     <children>
-      <ImageView fitHeight="38.0" fitWidth="38.0" layoutX="467.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="adminStatsIcon" fitHeight="38.0" fitWidth="38.0" layoutX="467.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true" visible="false">
          <image>
             <Image url="@../Assets/adminstats.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="36.0" fitWidth="37.0" layoutX="520.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="adminSettingIcon" fitHeight="36.0" fitWidth="37.0" layoutX="520.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true" visible="false">
          <image>
             <Image url="@../Assets/adminsettingsicon.png" />
          </image>
@@ -142,9 +142,9 @@
          </children>
       </HBox>
       <Button focusTraversable="false" layoutX="25.0" layoutY="21.0" mnemonicParsing="false" onAction="#viewStats" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" />
-      <Button focusTraversable="false" layoutX="520.0" layoutY="21.0" mnemonicParsing="false" onAction="#adminSettings" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" />
+      <Button fx:id="adminSettingsButton" focusTraversable="false" layoutX="520.0" layoutY="21.0" mnemonicParsing="false" onAction="#adminSettings" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" visible="false" />
         <Button fx:id="restartButton" layoutX="451.0" layoutY="316.0" mnemonicParsing="false" onAction="#handleRestart" prefHeight="36.0" prefWidth="107.0" styleClass="key" text="New Game" visible="false" />
-      <Button focusTraversable="false" layoutX="467.0" layoutY="20.0" mnemonicParsing="false" onAction="#adminStats" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" />
+      <Button fx:id="adminStatsButton" focusTraversable="false" layoutX="467.0" layoutY="20.0" mnemonicParsing="false" onAction="#adminStats" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" visible="false" />
             <Button fx:id="hintButton" focusTraversable="false" layoutX="73.0" layoutY="21.0" onAction="#requestHint" opacity="0.06" prefHeight="36.0" prefWidth="37.0" styleClass="key" />
     </children>
 </AnchorPane>
