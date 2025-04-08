@@ -91,6 +91,28 @@ After setting up the libraries, configure the database connection:
 
 ---
 
+### Hard Mode
+
+Hard Mode is a special challenge setting that hides all letters from your previous guesses, 
+leaving only color-coded feedback.
+
+🟩 Green = Correct letter, correct position
+
+🟨 Yellow = Correct letter, wrong position
+
+⬛ Gray = Letter is not in the word
+
+How It Works
+You can enable Hard Mode by checking the Hard Mode box at the start of the game.
+
+Once you submit your first guess, Hard Mode is locked in for the rest of the game.
+
+On future guesses, you will only see the color blocks from previous guesses — not the letters.
+
+💡 Use your memory and logic skills to deduce the secret word with limited visual cues!
+
+---
+
 ## Usage
 
 - **Running the Application:**
