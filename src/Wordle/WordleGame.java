@@ -317,46 +317,59 @@ public class WordleGame {
      */
     public void giveFeedbackOnWord(String word) {
         LetterStatus[] feedback = LetterStatus.getFeedback(word, referenceWord);
-        int currentRow = lRow; // Save the row we're working on
+        int currentRow = lRow; // Save the row index being processed
 
-        // Apply styles and letter visibility based on feedback
+        // Apply color feedback for current guess
         for (int i = 0; i < 5; i++) {
-            LetterStatus.Status status = feedback[i].getStatus();
             Label label = labels[currentRow][i];
+            LetterStatus.Status status = feedback[i].getStatus();
+            char letter = feedback[i].getLetter();
 
-            // Style based on status
             switch (status) {
                 case CORRECT:
                     label.setStyle("-fx-background-color: green; -fx-text-fill: white;");
-                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: green; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(letter, "-fx-background-color: green; -fx-text-fill: white;");
                     break;
                 case MISPLACED:
                     label.setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
-                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: yellow; -fx-text-fill: black;");
+                    updateKeyboardButtonStyle(letter, "-fx-background-color: yellow; -fx-text-fill: black;");
                     break;
                 case INCORRECT:
                     label.setStyle("-fx-background-color: gray; -fx-text-fill: white;");
-                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: #4F4F4F; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(letter, "-fx-background-color: #4F4F4F; -fx-text-fill: white;");
                     break;
             }
 
-            // In Hard Mode: hide letters for previous rows
-            if (isHardModeEnabled && currentRow < 5) {
-                label.setText(""); // Hide the guessed letter
+            // Set text only if not in hard mode, or if this is a win row
+            if (!isHardModeEnabled || checkWin(word)) {
+                label.setText(String.valueOf(letter));
             } else {
-                label.setText(String.valueOf(feedback[i].getLetter()));
+                label.setText(""); // Hide letters in hard mode (unless it's the win row)
             }
         }
 
-        // Win condition
-        if (checkWin(word)) {
-            UserStatisticsDAO.saveUserStatistics(userStats);
+        boolean win = checkWin(word);
+
+        if (win) {
+            if (userStats != null) {
+                UserStatisticsDAO.saveUserStatistics(userStats);
+            }
             restartButton.setVisible(true);
             disableInput();
             System.out.println("You guessed the word correctly!");
 
             if (StatDisplayController.instance != null) {
                 StatDisplayController.instance.refreshStats();
+            }
+        } else {
+            // In Hard Mode: hide the **previous row** letters (not current) after feedback is shown
+            if (isHardModeEnabled && lRow > 0) {
+                int prevRow = lRow - 1;
+                Platform.runLater(() -> {
+                    for (int i = 0; i < 5; i++) {
+                        labels[prevRow][i].setText("");
+                    }
+                });
             }
         }
     }
