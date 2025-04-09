@@ -2,14 +2,30 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.Controllers.AdminController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="445.0" prefWidth="721.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.Controllers.AdminController">
    <children>
-      <Button layoutX="14.0" layoutY="81.0" mnemonicParsing="false" onAction="#changeFile" prefHeight="36.0" prefWidth="163.0" styleClass="key" text="Change Vocab File" />
-      <Label layoutX="14.0" layoutY="14.0" minHeight="39.0" prefHeight="50.0" prefWidth="163.0" styleClass="word-cell" text="Current File:" textFill="WHITE" />
-      <TextField fx:id="fileName" editable="false" layoutX="191.0" layoutY="26.0" />
-      <Button layoutX="189.0" layoutY="81.0" mnemonicParsing="false" onAction="#undoFileChange" styleClass="key" text="Undo File Change" />
+      <Button layoutX="397.0" layoutY="92.0" mnemonicParsing="false" onAction="#changeFileReferenceWord" prefHeight="36.0" prefWidth="207.0" styleClass="key" text="Change Reference Word" />
+      <TextField fx:id="refrenceWordCurrentFile" editable="false" layoutX="397.0" layoutY="54.0" prefHeight="25.0" prefWidth="284.0" />
+      <Button layoutX="613.0" layoutY="92.0" mnemonicParsing="false" onAction="#undoRefFileChange" prefHeight="36.0" prefWidth="67.0" styleClass="key" text="Undo" />
+      <Button layoutX="45.0" layoutY="92.0" mnemonicParsing="false" onAction="#changeFileGuessWord" prefHeight="36.0" prefWidth="200.0" styleClass="key" text="Change Guess Word" />
+      <ListView fx:id="refrenceWordList" layoutX="397.0" layoutY="136.0" prefHeight="258.0" prefWidth="284.0" />
+      <Label layoutX="424.0" layoutY="14.0" text="Reference Word List" textFill="WHITE">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <ListView fx:id="guessWordList" layoutX="45.0" layoutY="136.0" prefHeight="258.0" prefWidth="277.0" />
+      <Label layoutX="91.0" layoutY="14.0" text="Guess Word List" textFill="WHITE">
+         <font>
+            <Font size="26.0" />
+         </font>
+      </Label>
+      <TextField fx:id="guessWordCurrentFile" editable="false" layoutX="45.0" layoutY="54.0" prefHeight="25.0" prefWidth="277.0" />
+      <Button layoutX="254.0" layoutY="92.0" mnemonicParsing="false" onAction="#undoGuessFileChange" prefHeight="36.0" prefWidth="67.0" styleClass="key" text="Undo " />
    </children>
 </AnchorPane>
