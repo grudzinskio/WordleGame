@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The Vocabulary class is responsible for loading and managing the dictionary words.
@@ -17,9 +18,11 @@ public class Vocabulary {
     private static final Vocabulary vocabulary = new Vocabulary();
     private String filePath;
     private Set<String> words;
+    private Set<String> validReferenceWords;
 
     public Vocabulary() {
         words = new HashSet<>();
+        validReferenceWords = words;
     }
     public static Vocabulary getVocabulary() {
         return vocabulary;
@@ -56,10 +59,50 @@ public class Vocabulary {
         return words.contains(word.toLowerCase());
     }
 
-    public String getRandomWord() {
+    /**
+     * gets a random word from the vocabulary file
+     * @param filterWord if a filter is needed for the vocabulary file - used for evil mode
+     * @return string containing the random word
+     */
+
+    public String getRandomWord(String filterWord) {
+
+        String referenceWord;
         if (words.isEmpty()) return "apple"; // Fallback if something goes wrong
-        int index = (int) (Math.random() * words.size());
-        return words.toArray(new String[0])[index];
+        //returns empty String if validReferenceWords is empty
+        if(validReferenceWords.isEmpty()) {
+            return "";
+        }
+        //get a random index from validReferenceWords
+        int index = (int) (Math.random() * validReferenceWords.size());
+
+        //get the word from the corresponding index
+        referenceWord = validReferenceWords.toArray(new String[0])[index];
+
+        //differentiate between regular wordle and evil wordle
+        if(!filterWord.isEmpty()) {
+            for(String c : filterWord.split("")) {
+                //filters words based on each character in filter word
+                validReferenceWords = validReferenceWords.stream().filter(word -> !word.contains(c.toLowerCase())).collect(Collectors.toSet());
+
+                //handles case where no more options are possible and index stays same
+                if(!validReferenceWords.isEmpty()) {
+                    //get a new index since validReferenceWords isn't empty
+                    index = (int) (Math.random() * validReferenceWords.size());
+                    //get the new word from the index
+                    referenceWord = validReferenceWords.toArray(new String[0])[index];
+                }
+            }
+        }
+
+        return referenceWord;
+    }
+
+    /**
+     * used to reset validReferenceWords after game reset
+     */
+    public void vocabRestart() {
+        validReferenceWords = words;
     }
 
 }
