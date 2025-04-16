@@ -103,7 +103,7 @@ public class AdminController {
                     game.handleRestart();
                 }
 
-                showStatusAnimation("Reference file changed!\\nNew game started.");
+                showStatusAnimation("Reference file changed!\nNew game started.");
             } catch (Exception e) {
                 showErrorAlert("Error updating reference file", e);
             }
