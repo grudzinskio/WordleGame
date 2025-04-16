@@ -27,7 +27,7 @@ public class AdminController {
 
     @FXML public TextField refrenceWordCurrentFile;
     @FXML public ListView<String> guessWordList;
-    @FXML private Label statusLabel; // fx:id in FXML
+    @FXML private Label statusLabel;
 
     private final Queue<String> refFilePaths = new LinkedList<>();
     private final Queue<String> guessFilePaths = new LinkedList<>();
@@ -35,28 +35,31 @@ public class AdminController {
 
     @FXML
     public void initialize() {
-        // set up reference file display
-        String initialPath = vocabulary.getReferenceFilePath();
-        refrenceWordCurrentFile.setText(new File(initialPath).getName());
-        refFilePaths.add(initialPath);
+        try {
+            // set up reference file display
+            String initialPath = vocabulary.getReferenceFilePath();
+            refrenceWordCurrentFile.setText(new File(initialPath).getName());
+            refFilePaths.add(initialPath);
 
-        // populate guess list
-        guessWordObservableList.addAll(vocabulary.getGuessableWords());
-        guessWordList.setItems(guessWordObservableList);
+            // populate guess list
+            guessWordObservableList.addAll(vocabulary.getGuessableWords());
+            guessWordList.setItems(guessWordObservableList);
 
-        // click to remove
-        guessWordList.setOnMouseClicked(e -> {
-            String w = guessWordList.getSelectionModel().getSelectedItem();
-            if (w != null) {
-                vocabulary.removeGuessWord(w);
-                guessWordObservableList.remove(w);
-            }
-        });
+            // click to remove
+            guessWordList.setOnMouseClicked(e -> {
+                String w = guessWordList.getSelectionModel().getSelectedItem();
+                if (w != null) {
+                    vocabulary.removeGuessWord(w);
+                    guessWordObservableList.remove(w);
+                }
+            });
+        } catch (Exception e) {
+            showErrorAlert("Error during initialization", e);
+        }
     }
 
     public void changeFileGuessWord(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
-        // Set initial directory to "repository" folder if it exists
         File repoDir = new File(System.getProperty("user.dir"), "repository");
         if (!repoDir.exists() || !repoDir.isDirectory()) {
             repoDir = new File(System.getProperty("user.dir"));
@@ -70,14 +73,15 @@ public class AdminController {
                 vocabulary.addGuessWords(lines);
                 guessWordObservableList.addAll(lines);
             } catch (IOException e) {
-                e.printStackTrace();
+                showErrorAlert("Error reading guess words file", e);
+            } catch (Exception e) {
+                showErrorAlert("Unexpected error while processing the guess words file", e);
             }
         }
     }
 
     public void changeFileReferenceWord(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
-        // Set initial directory to "repository" folder if it exists
         File repoDir = new File(System.getProperty("user.dir"), "repository");
         if (!repoDir.exists() || !repoDir.isDirectory()) {
             repoDir = new File(System.getProperty("user.dir"));
@@ -93,14 +97,15 @@ public class AdminController {
                 vocabulary.loadWords(file.getPath());
                 refrenceWordCurrentFile.setText(new File(vocabulary.getReferenceFilePath()).getName());
 
-                // restart game
+                // restart game if available
                 WordleGame game = WordleGame.getCurrentGame();
-                if (game != null) game.handleRestart();
+                if (game != null) {
+                    game.handleRestart();
+                }
 
-                // animate status
-                showStatusAnimation("Reference file changed!\nNew game started.");
+                showStatusAnimation("Reference file changed!\\nNew game started.");
             } catch (Exception e) {
-                e.printStackTrace();
+                showErrorAlert("Error updating reference file", e);
             }
         }
     }
@@ -109,9 +114,13 @@ public class AdminController {
         if (refFilePaths.isEmpty()) {
             new Alert(Alert.AlertType.ERROR, "Unable to Undo").show();
         } else {
-            String old = refFilePaths.poll();
-            vocabulary.loadWords(old);
-            refrenceWordCurrentFile.setText(new File(vocabulary.getReferenceFilePath()).getName());
+            try {
+                String old = refFilePaths.poll();
+                vocabulary.loadWords(old);
+                refrenceWordCurrentFile.setText(new File(vocabulary.getReferenceFilePath()).getName());
+            } catch (Exception e) {
+                showErrorAlert("Error undoing reference file change", e);
+            }
         }
     }
 
@@ -123,7 +132,7 @@ public class AdminController {
         return true;
     }
 
-    /** Fade in → pause → fade out */
+    /** Fade in → pause → fade out animation for status label */
     private void showStatusAnimation(String message) {
         statusLabel.setText(message);
 
@@ -141,5 +150,10 @@ public class AdminController {
         pause.setOnFinished(e -> fadeOut.play());
 
         fadeIn.play();
+    }
+
+    private void showErrorAlert(String message, Exception e) {
+        new Alert(Alert.AlertType.ERROR, message + ": " + e.getMessage()).show();
+        e.printStackTrace();
     }
 }
