@@ -1,65 +1,106 @@
+// File: src/Wordle/Vocabulary.java
 package Wordle;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-/**
- * The Vocabulary class is responsible for loading and managing the dictionary words.
- * It provides methods to load words from a text file and check if a word exists in the dictionary.
- * 
- * @version 1.0
- * @created 14-Feb-2025 1:31:08 PM
- */
 public class Vocabulary {
-    private static final Vocabulary vocabulary = new Vocabulary();
-    private String filePath;
-    private Set<String> words;
+    private static final Vocabulary INSTANCE = new Vocabulary();
 
-    public Vocabulary() {
-        words = new HashSet<>();
-    }
+    private String referenceFilePath = "";
+    private String guessFilePath = "";
+
+    private final List<String> referenceWords = new ArrayList<>();
+    private final List<String> guessableWords = new ArrayList<>();
+
+    private final Random random = new Random();
+
+    public Vocabulary() { }
+
     public static Vocabulary getVocabulary() {
-        return vocabulary;
+        return INSTANCE;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public String getReferenceFilePath() {
+        return referenceFilePath;
     }
 
-    /**
-     * Loads words from the specified text file into the dictionary.
-     * 
-     * @param filePath The path to the text file containing the dictionary words.
-     */
+    // Loads reference words from the given file path and stores them in referenceWords.
     public void loadWords(String filePath) {
-        this.filePath = filePath;
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                words.add(line.trim().toLowerCase());
+        this.referenceFilePath = filePath;
+        referenceWords.clear();
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(filePath));
+            for (String line : lines) {
+                String word = line.trim();
+                if (!word.isEmpty() && !referenceWords.contains(word)) {
+                    referenceWords.add(word);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Checks if the specified word exists in the dictionary.
-     * 
-     * @param word The word to check.
-     * @return True if the word exists in the dictionary, false otherwise.
-     */
-    public boolean contains(String word) {
-        return words.contains(word.toLowerCase());
+    // Loads guessable words from the given file path.
+    public void loadGuessWords(String filePath) {
+        this.guessFilePath = filePath;
+        guessableWords.clear();
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(filePath));
+            for (String line : lines) {
+                String word = line.trim();
+                if (!word.isEmpty() && !guessableWords.contains(word)) {
+                    guessableWords.add(word);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    public List<String> getReferenceWords() {
+        return new ArrayList<>(referenceWords);
+    }
+
+    public List<String> getGuessableWords() {
+        return new ArrayList<>(guessableWords);
+    }
+
+    // Adds new words to the guessable words list.
+    public void addGuessWords(List<String> newWords) {
+        for (String word : newWords) {
+            String trimmed = word.trim();
+            if (!trimmed.isEmpty() && !guessableWords.contains(trimmed)) {
+                guessableWords.add(trimmed);
+            }
+        }
+    }
+
+    // Removes a word from the guessable words list.
+    public void removeGuessWord(String word) {
+        guessableWords.remove(word);
+    }
+
+    // Resets additional guess words.
+    public void resetAdditionalGuessWords() {
+        guessableWords.clear();
+    }
+
+    // Returns a random reference word from the loaded reference words.
     public String getRandomWord() {
-        if (words.isEmpty()) return "apple"; // Fallback if something goes wrong
-        int index = (int) (Math.random() * words.size());
-        return words.toArray(new String[0])[index];
+        if (referenceWords.isEmpty()) {
+            return "";
+        }
+        return referenceWords.get(random.nextInt(referenceWords.size()));
     }
 
+    // Checks if the provided word exists in either the reference or guessable words.
+    public boolean contains(String word) {
+        return referenceWords.contains(word) || guessableWords.contains(word);
+    }
 }
