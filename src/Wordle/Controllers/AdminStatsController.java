@@ -1,4 +1,3 @@
-// java
 package Wordle.Controllers;
 
 import Wordle.Statistics.UserStatisticsDAO;
