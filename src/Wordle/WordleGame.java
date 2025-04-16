@@ -34,6 +34,7 @@ import java.util.List;
  * @created 14-Feb-2025 1:31:10 PM
  */
 public class WordleGame {
+    public static WordleGame currentGame;
     @FXML
     private ImageView adminSettingIcon;
     @FXML
@@ -111,6 +112,8 @@ public class WordleGame {
      */
     @FXML
     public void initialize() {
+        // Set static instance reference.
+        currentGame = this;
         userStats = UserStats.getInstance();
         if (userStats.getUsername().equals("Admin")) {
             adminSettingsButton.setVisible(true);
@@ -120,36 +123,27 @@ public class WordleGame {
         }
         if (hardModeToggle != null) {
             isHardModeEnabled = hardModeToggle.isSelected();
-
-            // Listen for user changes before first guess
             hardModeToggle.setOnAction(e -> {
                 if (!firstGuessMade) {
                     isHardModeEnabled = hardModeToggle.isSelected();
                     hardModeIndicator.setVisible(isHardModeEnabled);
                 } else {
-                    // Lock the checkbox after the first guess
                     hardModeToggle.setDisable(true);
                 }
             });
-
             hardModeIndicator.setVisible(isHardModeEnabled);
         }
         referenceWord = vocabulary.getRandomWord().toUpperCase();
         System.out.println("Word is: " + referenceWord);
         userStats = UserStats.getInstance();
-
         populateLabels();
-
         restartButton.setVisible(false);
-
-        // Ensure rootPane has focus to capture key events
         Platform.runLater(() -> rootPane.requestFocus());
-
-        // Handle key presses from physical keyboard
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
-
-        // Regain focus when clicking anywhere on the pane
         rootPane.setOnMouseClicked(event -> rootPane.requestFocus());
+    }
+    public static WordleGame getCurrentGame() {
+        return currentGame;
     }
 
     /**
@@ -376,61 +370,45 @@ public class WordleGame {
 
 
     @FXML
-    private void handleRestart() {
+    public void handleRestart() {
         firstGuessMade = false;
         if (hardModeToggle != null) {
-            hardModeToggle.setDisable(false); // Re-enable toggle for new game
-            isHardModeEnabled = hardModeToggle.isSelected(); // Refresh value
+            hardModeToggle.setDisable(false);
+            isHardModeEnabled = hardModeToggle.isSelected();
             hardModeIndicator.setVisible(isHardModeEnabled);
         }
         lRow = 0;
         lCol = 0;
         characters.clear();
         hintsUsed = 0;
-        hintButton.setDisable(false); // Re-enable the hint button
+        hintButton.setDisable(false);
         guess_display.setText("6");
-
-        // Re-read hard mode toggle (if available) in case it was changed
         if (hardModeToggle != null) {
             isHardModeEnabled = hardModeToggle.isSelected();
         }
-
-        // Update the hard mode indicator label visibility
         if (hardModeIndicator != null) {
             hardModeIndicator.setVisible(isHardModeEnabled);
         }
-
-        // Clear all grid labels and reset hint cell tracking
         for (int r = 0; r < 6; r++) {
             for (int c = 0; c < 5; c++) {
                 if (labels[r][c] != null) {
-                    labels[r][c].setText("");      // Clear letter
-                    labels[r][c].setStyle("");     // Clear background color
-                    hintCells[r][c] = false;       // Reset hint markers
+                    labels[r][c].setText("");
+                    labels[r][c].setStyle("");
+                    hintCells[r][c] = false;
                 }
             }
         }
-
-        // Reset keyboard button styles and re-enable them
         keyboardBox.lookupAll(".key").forEach(node -> {
             if (node instanceof Button) {
-                node.setStyle("");          // Clear any coloring
-                node.setDisable(false);     // Enable key again
+                node.setStyle("");
+                node.setDisable(false);
             }
         });
-
-        // Choose a new word and reset stats
         referenceWord = vocabulary.getRandomWord().toUpperCase();
         System.out.println("New word: " + referenceWord);
-
-        // Hide restart button again
         restartButton.setVisible(false);
-
-        // Re-enable keyboard and focus handling
         Platform.runLater(() -> rootPane.requestFocus());
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
-
-        // Reset user stats for the new game
         userStats.resetStats();
     }
 
