@@ -70,14 +70,14 @@ public class WordleGame {
 
     public static boolean isHardModeEnabled = false;
 
-    private boolean evilWordleEnabled = false;
+    public boolean evilWordleEnabled = false;
 
     private boolean firstGuessMade = false;
 
 
     public String referenceWord;
     private UserStats userStats;
-    private Vocabulary vocabulary = new Vocabulary();
+    public Vocabulary vocabulary = new Vocabulary();
     private StatDisplayController instance = new StatDisplayController();
     public Label[][] labels;
     public int lRow = 0;
@@ -371,8 +371,6 @@ public class WordleGame {
                 // changes the reference word if it isn't empty
                 referenceWord = tempWord;
             }
-            System.out.println(referenceWord);
-            System.out.println(word);
         }
         LetterStatus[] feedback = LetterStatus.getFeedback(word, referenceWord);
         int currentRow = lRow; // Save the row index being processed
