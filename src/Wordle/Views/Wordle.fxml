@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="rootPane" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="582.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleGame">
+<AnchorPane id="rootPane" fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="617.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleGame">
     <children>
       <ImageView fx:id="adminStatsIcon" fitHeight="38.0" fitWidth="38.0" layoutX="467.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true" visible="false">
          <image>
@@ -35,7 +35,7 @@
             <Image url="@../Assets/statisicons.png" />
          </image>
       </ImageView>
-        <VBox fx:id="keyboardBox" alignment="BOTTOM_CENTER" layoutY="406.0" prefHeight="213.0" prefWidth="582.0" spacing="10.0">
+        <VBox fx:id="keyboardBox" alignment="BOTTOM_CENTER" layoutY="406.0" prefHeight="213.0" prefWidth="617.0" spacing="10.0">
             <children>
                 <HBox alignment="CENTER" prefHeight="61.0" prefWidth="493.0" spacing="5.0">
                     <children>
@@ -79,7 +79,7 @@
                 </HBox>
             </children>
         </VBox>
-      <GridPane fx:id="gridPane" hgap="10.0" layoutX="169.0" layoutY="40.0" prefHeight="300.0" prefWidth="243.0" vgap="10.0">
+      <GridPane fx:id="gridPane" hgap="10.0" layoutX="188.0" layoutY="40.0" prefHeight="300.0" prefWidth="243.0" vgap="10.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -128,7 +128,7 @@
             <Label alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="49.0" styleClass="word-cell" stylesheets="@style.css" GridPane.columnIndex="3" GridPane.rowIndex="1" />
          </children>
       </GridPane>
-      <HBox alignment="CENTER" layoutX="203.0" layoutY="353.0" prefHeight="36.0" prefWidth="190.0" spacing="10.0">
+      <HBox alignment="CENTER" layoutX="221.0" layoutY="353.0" prefHeight="36.0" prefWidth="190.0" spacing="10.0">
          <children>
             <Label text="Guesses Left" textFill="WHITE">
                <font>
@@ -144,10 +144,11 @@
       </HBox>
       <Button focusTraversable="false" layoutX="25.0" layoutY="21.0" mnemonicParsing="false" onAction="#viewStats" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" />
       <Button fx:id="adminSettingsButton" focusTraversable="false" layoutX="520.0" layoutY="21.0" mnemonicParsing="false" onAction="#adminSettings" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" visible="false" />
-        <Button fx:id="restartButton" layoutX="451.0" layoutY="316.0" mnemonicParsing="false" onAction="#handleRestart" prefHeight="36.0" prefWidth="107.0" styleClass="key" text="New Game" visible="false" />
+        <Button fx:id="restartButton" layoutX="475.0" layoutY="316.0" mnemonicParsing="false" onAction="#handleRestart" prefHeight="36.0" prefWidth="107.0" styleClass="key" text="New Game" visible="false" />
       <Button fx:id="adminStatsButton" focusTraversable="false" layoutX="467.0" layoutY="20.0" mnemonicParsing="false" onAction="#adminStats" opacity="0.0" prefHeight="36.0" prefWidth="37.0" styleClass="key" visible="false" />
             <Button fx:id="hintButton" focusTraversable="false" layoutX="73.0" layoutY="21.0" onAction="#requestHint" opacity="0.06" prefHeight="36.0" prefWidth="37.0" styleClass="key" />
         <CheckBox fx:id="hardModeToggle" focusTraversable="false" layoutX="32.0" layoutY="77.0" style="-fx-text-fill: white;" text="Hard Mode" />
         <Label fx:id="hardModeIndicator" layoutX="235.0" layoutY="8.0" prefHeight="26.0" prefWidth="126.0" style="-fx-text-fill: red; -fx-font-weight: bold;" text="HARD MODE ON" visible="false" />
+      <Button fx:id="listHintButton" layoutX="491.0" layoutY="71.0" mnemonicParsing="false" onAction="#handleListHint" prefHeight="36.0" prefWidth="91.0" styleClass="key" stylesheets="@style.css" text="HintList" />
     </children>
 </AnchorPane>
