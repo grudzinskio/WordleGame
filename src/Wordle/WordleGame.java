@@ -1,6 +1,7 @@
 package Wordle;
 
 import Wordle.Controllers.StatDisplayController;
+import Wordle.Statistics.HighScoreDAO;
 import Wordle.Statistics.UserStatisticsDAO;
 import Wordle.Statistics.UserStats;
 import javafx.application.Platform;
@@ -34,6 +35,8 @@ import java.util.*;
 public class WordleGame {
     public CheckBox evilModeToggle;
     public static WordleGame currentGame;
+    @FXML
+    public Button leaderboardButton;
     @FXML
     private ImageView adminSettingIcon;
     @FXML
@@ -80,6 +83,7 @@ public class WordleGame {
 
     private boolean firstGuessMade = false;
 
+    private long startTime; // Timer start in milliseconds
 
     public String referenceWord;
     private UserStats userStats;
@@ -160,6 +164,9 @@ public class WordleGame {
         Platform.runLater(() -> rootPane.requestFocus());
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
         rootPane.setOnMouseClicked(event -> rootPane.requestFocus());
+
+        // Start the timer when the game challenge is accepted/started.
+        startTime = System.currentTimeMillis();
     }
     public static WordleGame getCurrentGame() {
         return currentGame;
@@ -420,12 +427,15 @@ public class WordleGame {
         boolean win = checkWin(word);
 
         if (win) {
+            long endTime = System.currentTimeMillis();
+            long elapsedTimeSeconds = (endTime - startTime) / 1000;
+            HighScoreDAO.saveHighScore(userStats.getUsername(), lRow + 1, (int) elapsedTimeSeconds);
             if (userStats != null) {
                 UserStatisticsDAO.saveUserStatistics(userStats);
             }
             restartButton.setVisible(true);
             disableInput();
-            System.out.println("You guessed the word correctly!");
+            System.out.println("You guessed correctly in " + elapsedTimeSeconds + " seconds and " + lRow + " guesses!");
 
             if (StatDisplayController.instance != null) {
                 StatDisplayController.instance.refreshStats();
@@ -500,6 +510,9 @@ public class WordleGame {
         Platform.runLater(() -> rootPane.requestFocus());
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
         userStats.resetStats();
+
+        // Restart the leaderboard time
+        startTime = System.currentTimeMillis();
     }
 
 
@@ -612,6 +625,23 @@ public class WordleGame {
 		Parent stats = FXMLLoader.load(getClass().getResource("Views/Stats_Display.fxml"));
 		Scene scene = new Scene(stats);
 		Stage stage = new Stage();
+
+        stage.setScene(scene);
+        stage.setTitle("User Stats");
+        stage.setOnHidden(e -> requestFocusOnRootPane()); // Request focus on rootPane when window is closed
+        stage.show();
+    }
+
+    /**
+     * Created by Mathias G
+     * This launches the secondary window pop-up to display a user's stats
+     * @param actionEvent actionEvent is when the View Stats button is clicked
+     * @throws IOException Exception thrown if fxml issues occur and file can't be loaded
+     */
+    public void viewLeaderboard(ActionEvent actionEvent) throws IOException {
+        Parent stats = FXMLLoader.load(getClass().getResource("Views/HighScoreBoard.fxml"));
+        Scene scene = new Scene(stats);
+        Stage stage = new Stage();
 
         stage.setScene(scene);
         stage.setTitle("User Stats");
