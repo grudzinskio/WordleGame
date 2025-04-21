@@ -11,9 +11,7 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
@@ -72,6 +70,7 @@ public class WordleGame {
 
     @FXML
     private Button listHintButton;
+    @FXML
     private ContextMenu suggestionPopup;   //THis is the popup where list of words are shown
 
 

@@ -1,11 +1,7 @@
 // File: src/Wordle/Vocabulary.java
 package Wordle;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -23,8 +19,8 @@ import java.util.Random;
 public class Vocabulary {
 
     private String filePath;
-    private Set<String> words;
-    private Set<String> validReferenceWords;
+
+    private List<String> validReferenceWords = new ArrayList<>();
     private static final Vocabulary INSTANCE = new Vocabulary();
 
     private String referenceFilePath = "";
@@ -36,8 +32,7 @@ public class Vocabulary {
     private final Random random = new Random();
 
     public Vocabulary() {
-        words = new HashSet<>();
-        validReferenceWords = words;
+
     }
     public static Vocabulary getVocabulary() {
         return INSTANCE;
@@ -59,6 +54,7 @@ public class Vocabulary {
                     referenceWords.add(word);
                 }
             }
+            validReferenceWords = referenceWords;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,7 +114,7 @@ public class Vocabulary {
     public String getRandomWord(String filterWord) {
 
         String referenceWord;
-        if (words.isEmpty()) return "apple"; // Fallback if something goes wrong
+        if (referenceWords.isEmpty()) return "apple"; // Fallback if something goes wrong
         //returns empty String if validReferenceWords is empty
         if(validReferenceWords.isEmpty()) {
             return "";
@@ -133,7 +129,7 @@ public class Vocabulary {
         if(!filterWord.isEmpty()) {
             for(String c : filterWord.split("")) {
                 //filters words based on each character in filter word
-                validReferenceWords = validReferenceWords.stream().filter(word -> !word.contains(c.toLowerCase())).collect(Collectors.toSet());
+                validReferenceWords = validReferenceWords.stream().filter(word -> !word.contains(c.toLowerCase())).collect(Collectors.toList());
 
                 //handles case where no more options are possible and index stays same
                 if(!validReferenceWords.isEmpty()) {
@@ -152,7 +148,7 @@ public class Vocabulary {
      * used to reset validReferenceWords after game reset
      */
     public void vocabRestart() {
-        validReferenceWords = words;
+        validReferenceWords = referenceWords;
     }
     // Checks if the provided word exists in either the reference or guessable words.
     public boolean contains(String word) {
