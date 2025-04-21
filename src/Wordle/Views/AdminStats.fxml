@@ -5,22 +5,27 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
 
-<AnchorPane stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.Controllers.AdminStatsController">
-    <VBox prefWidth="553.0">
-      <HBox prefHeight="20.0" prefWidth="200.0">
-         <children>
-              <Label prefHeight="17.0" prefWidth="291.0" text="Guessed Letters" textFill="WHITE" />
-              <Label prefHeight="17.0" prefWidth="285.0" text="Gussed Words" textFill="WHITE" />
-         </children>
-      </HBox>
-        <HBox>
-            <ListView fx:id="topLettersList" prefHeight="180.0" prefWidth="280.0" stylesheets="@style.css" />
-            <ListView fx:id="topWordsList" prefHeight="180.0" prefWidth="280.0" />
+<AnchorPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.Controllers.AdminStatsController" stylesheets="@admin-stats.css">
+    <VBox spacing="10" prefWidth="600" styleClass="main-container">
+
+        <!-- Header Row -->
+        <HBox spacing="10">
+            <Label text="Guessed Letters" styleClass="section-title" />
+            <Label text="Guessed Words" styleClass="section-title" />
         </HBox>
-      <HBox prefHeight="2.0" prefWidth="553.0" />
-        <HBox />
-        <Label text="All Users" textFill="WHITE" />
-        <ListView fx:id="usersList" prefHeight="180.0" prefWidth="553.0" />
+
+        <!-- Lists for Letters and Words -->
+        <HBox spacing="10">
+            <ListView fx:id="topLettersList" prefHeight="200" prefWidth="290" />
+            <ListView fx:id="topWordsList" prefHeight="200" prefWidth="290" />
+        </HBox>
+
+        <Line stroke="gray" strokeWidth="1" />
+
+        <!-- Users Section -->
+        <Label text="All Users" styleClass="section-title" />
+        <ListView fx:id="usersList" prefHeight="200" prefWidth="580" />
     </VBox>
 </AnchorPane>
