@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" stylesheets="@style.css"  fx:controller="Wordle.Controllers.HighScoreController">
+    <children>
+        <ListView fx:id="highScoreList" layoutX="20.0" layoutY="20.0" prefHeight="400.0" prefWidth="360.0" />
+        <Button text="Close" layoutX="160.0" layoutY="440.0" onAction="#handleClose" />
+    </children>
+</AnchorPane>
