@@ -156,4 +156,16 @@ public class AdminController {
         new Alert(Alert.AlertType.ERROR, message + ": " + e.getMessage()).show();
         e.printStackTrace();
     }
+
+    @FXML
+    public void resetGuessWords(ActionEvent actionEvent) {
+        // Reset the vocabulary's guess words to default state
+        vocabulary.resetGuessWords();
+        // Clear the current list
+        guessWordObservableList.clear();
+        // Repopulate with the default guess words from vocabulary
+        guessWordObservableList.addAll(vocabulary.getGuessableWords());
+        // Optionally update the view (if not automatically bound)
+        guessWordList.setItems(guessWordObservableList);
+    }
 }

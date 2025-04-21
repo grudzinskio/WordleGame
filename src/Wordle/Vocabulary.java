@@ -99,6 +99,12 @@ public class Vocabulary {
     public void removeGuessWord(String word) {
         guessableWords.remove(word);
     }
+    public void resetGuessWords() {
+        // Clear the current list and add the default guess words.
+        guessableWords.clear();
+    }
+
+
 
     // Resets additional guess words.
     public void resetAdditionalGuessWords() {
