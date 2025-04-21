@@ -135,7 +135,11 @@ On future guesses, you will only see the color blocks from previous guesses — 
 
 ## Copyright and License
 
-Copyright <2025> <Grudzinski, Galvan, Gill, Harris, Thouta>
+We chose the MIT License because its simplicity and permissiveness allow anyone—whether in open‑source communities or commercial 
+environments—to use, modify, and redistribute our work without friction. By requiring only that we receive credit,
+it maximizes adoption while keeping legal overhead to an absolute minimum.
+
+Copyright <2025> <Group 15>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”),
 to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
