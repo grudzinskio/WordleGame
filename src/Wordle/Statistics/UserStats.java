@@ -71,10 +71,6 @@ public class UserStats{
         return ((double) guessCount) / games;
     }
 
-//    public void updateGamesCount() {
-//        games++;
-//    }
-
     /**
      * updates user's stats based on inputted guess
      *

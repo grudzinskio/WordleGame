@@ -1,132 +1,159 @@
 package Wordle.Controllers;
 
 import Wordle.Vocabulary;
+import Wordle.WordleGame;
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class AdminController {
-    // Vocabulary instance
     private final Vocabulary vocabulary = Vocabulary.getVocabulary();
 
-    // Display current file paths for each
-    @FXML
-    public TextField refrenceWordCurrentFile;
-    @FXML
-    public TextField guessWordCurrentFile;
+    @FXML public TextField refrenceWordCurrentFile;
+    @FXML public ListView<String> guessWordList;
+    @FXML private Label statusLabel;
 
-    @FXML
-    public ListView refrenceWordList;
-    @FXML
-    public ListView guessWordList;
-
-    // Separate queues for file history for each type
     private final Queue<String> refFilePaths = new LinkedList<>();
     private final Queue<String> guessFilePaths = new LinkedList<>();
+    private ObservableList<String> guessWordObservableList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        String initialPath = vocabulary.getFilePath();
-        refrenceWordCurrentFile.setText(initialPath);
-        guessWordCurrentFile.setText(initialPath);
-        refFilePaths.add(initialPath);
-        guessFilePaths.add(initialPath);
-    }
+        try {
+            // set up reference file display
+            String initialPath = vocabulary.getReferenceFilePath();
+            refrenceWordCurrentFile.setText(new File(initialPath).getName());
+            refFilePaths.add(initialPath);
 
-    /**
-     * Changes the vocab file for reference words.
-     * @param actionEvent when button clicked.
-     */
-    public void changeFileReferenceWord(ActionEvent actionEvent) {
-        FileChooser fileChooser = new FileChooser();
-        File file = fileChooser.showOpenDialog(null);
+            // populate guess list
+            guessWordObservableList.addAll(vocabulary.getGuessableWords());
+            guessWordList.setItems(guessWordObservableList);
 
-        if (file != null) {
-            try {
-                if (validateFile(file)) {
-                    // Save current reference file path
-                    refFilePaths.add(vocabulary.getFilePath());
-                    vocabulary.loadWords(file.getPath());
-                    refrenceWordCurrentFile.setText(vocabulary.getFilePath());
+            // click to remove
+            guessWordList.setOnMouseClicked(e -> {
+                String w = guessWordList.getSelectionModel().getSelectedItem();
+                if (w != null) {
+                    vocabulary.removeGuessWord(w);
+                    guessWordObservableList.remove(w);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            });
+        } catch (Exception e) {
+            showErrorAlert("Error during initialization", e);
         }
     }
 
-    /**
-     * Changes the vocab file for guess words.
-     * @param actionEvent when button clicked.
-     */
     public void changeFileGuessWord(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
+        File repoDir = new File(System.getProperty("user.dir"), "repository");
+        if (!repoDir.exists() || !repoDir.isDirectory()) {
+            repoDir = new File(System.getProperty("user.dir"));
+        }
+        fileChooser.setInitialDirectory(repoDir);
         File file = fileChooser.showOpenDialog(null);
-
-        if (file != null) {
+        if (file != null && validateFile(file)) {
             try {
-                if (validateFile(file)) {
-                    // Save current guess file path
-                    guessFilePaths.add(vocabulary.getFilePath());
-                    vocabulary.loadWords(file.getPath());
-                    guessWordCurrentFile.setText(vocabulary.getFilePath());
-                }
+                guessFilePaths.add(vocabulary.getReferenceFilePath());
+                List<String> lines = Files.readAllLines(file.toPath());
+                vocabulary.addGuessWords(lines);
+                guessWordObservableList.addAll(lines);
+            } catch (IOException e) {
+                showErrorAlert("Error reading guess words file", e);
             } catch (Exception e) {
-                e.printStackTrace();
+                showErrorAlert("Unexpected error while processing the guess words file", e);
             }
         }
     }
 
-    /**
-     * Determines if an inputted file is the correct format.
-     * @param file file to be checked.
-     * @return boolean value on file status.
-     */
+    public void changeFileReferenceWord(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        File repoDir = new File(System.getProperty("user.dir"), "repository");
+        if (!repoDir.exists() || !repoDir.isDirectory()) {
+            repoDir = new File(System.getProperty("user.dir"));
+        }
+        fileChooser.setInitialDirectory(repoDir);
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null && validateFile(file)) {
+            try {
+                // backup old path
+                refFilePaths.add(vocabulary.getReferenceFilePath());
+
+                // load new words & update display
+                vocabulary.loadWords(file.getPath());
+                refrenceWordCurrentFile.setText(new File(vocabulary.getReferenceFilePath()).getName());
+
+                // restart game if available
+                WordleGame game = WordleGame.getCurrentGame();
+                if (game != null) {
+                    game.handleRestart();
+                }
+
+                showStatusAnimation("Reference file changed!\nNew game started.");
+            } catch (Exception e) {
+                showErrorAlert("Error updating reference file", e);
+            }
+        }
+    }
+
+    public void undoRefFileChange(ActionEvent actionEvent) {
+        if (refFilePaths.isEmpty()) {
+            new Alert(Alert.AlertType.ERROR, "Unable to Undo").show();
+        } else {
+            try {
+                String old = refFilePaths.poll();
+                vocabulary.loadWords(old);
+                refrenceWordCurrentFile.setText(new File(vocabulary.getReferenceFilePath()).getName());
+            } catch (Exception e) {
+                showErrorAlert("Error undoing reference file change", e);
+            }
+        }
+    }
+
     private boolean validateFile(File file) {
-        if (!String.valueOf(file).endsWith(".txt")) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Wrong file type, must be .txt");
-            alert.show();
+        if (!file.getName().endsWith(".txt")) {
+            new Alert(Alert.AlertType.ERROR, "Wrong file type, must be .txt").show();
             return false;
         }
         return true;
     }
 
-    /**
-     * Button action to undo the reference file change.
-     * @param actionEvent when button clicked.
-     */
-    public void undoRefFileChange(ActionEvent actionEvent) {
-        if (refFilePaths.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to Undo");
-            alert.show();
-        } else {
-            String currentPath = vocabulary.getFilePath();
-            vocabulary.loadWords(refFilePaths.poll());
-            refrenceWordCurrentFile.setText(vocabulary.getFilePath());
-            refFilePaths.add(currentPath);
-        }
+    /** Fade in → pause → fade out animation for status label */
+    private void showStatusAnimation(String message) {
+        statusLabel.setText(message);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(400), statusLabel);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(2));
+
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(400), statusLabel);
+        fadeOut.setFromValue(1);
+        fadeOut.setToValue(0);
+
+        fadeIn.setOnFinished(e -> pause.play());
+        pause.setOnFinished(e -> fadeOut.play());
+
+        fadeIn.play();
     }
 
-    /**
-     * Button action to undo the guess file change.
-     * @param actionEvent when button clicked.
-     */
-    public void undoGuessFileChange(ActionEvent actionEvent) {
-        if (guessFilePaths.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to Undo");
-            alert.show();
-        } else {
-            String currentPath = vocabulary.getFilePath();
-            vocabulary.loadWords(guessFilePaths.poll());
-            guessWordCurrentFile.setText(vocabulary.getFilePath());
-            guessFilePaths.add(currentPath);
-        }
+    private void showErrorAlert(String message, Exception e) {
+        new Alert(Alert.AlertType.ERROR, message + ": " + e.getMessage()).show();
+        e.printStackTrace();
     }
 }
