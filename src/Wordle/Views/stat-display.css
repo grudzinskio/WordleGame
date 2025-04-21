@@ -1,0 +1,59 @@
+.root {
+    -fx-background-color: #121213;
+}
+
+.title-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-alignment: center;
+}
+
+.section-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.footer-value {
+    -fx-font-size: 18px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.card {
+    -fx-padding: 15;
+    -fx-background-color: #1e1e1e;
+    -fx-background-radius: 10;
+    -fx-border-color: #3a3a3a;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 6, 0, 0, 3);
+}
+
+.combo-box {
+    -fx-background-color: #333;
+    -fx-border-color: #555;
+    -fx-text-fill: white;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+}
+
+.list-view {
+    -fx-background-insets: 0;
+    -fx-control-inner-background: #1e1e1e;
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+}
+
+.list-cell {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+.list-cell:filled:selected, .list-cell:filled:selected:hover {
+    -fx-background-color: #3a3f4b;
+    -fx-text-fill: white;
+}
