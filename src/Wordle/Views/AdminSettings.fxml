@@ -37,7 +37,7 @@
       <ListView fx:id="guessWordList" layoutX="29.0" layoutY="100.0" prefHeight="258.0" prefWidth="134.0" />
 
       <!-- Reset List Button -->
-      <Button layoutX="29.0" layoutY="376.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="134.0" styleClass="key" text="Reset List" />
+      <Button layoutX="29.0" layoutY="376.0" mnemonicParsing="false" onAction="#resetGuessWords" prefHeight="25.0" prefWidth="134.0" styleClass="key" text="Reset List" />
 
       <!-- Status Label for Animations -->
       <Label fx:id="statusLabel" layoutX="316.0" layoutY="229.0" opacity="0" styleClass="status-label" text="" />
