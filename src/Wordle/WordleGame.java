@@ -32,6 +32,7 @@ import java.util.*;
  * @created 14-Feb-2025 1:31:10 PM
  */
 public class WordleGame {
+    public CheckBox evilModeToggle;
     public static WordleGame currentGame;
     @FXML
     private ImageView adminSettingIcon;
@@ -69,17 +70,20 @@ public class WordleGame {
 
     @FXML
     private Button listHintButton;
+    @FXML
     private ContextMenu suggestionPopup;   //THis is the popup where list of words are shown
 
 
     public static boolean isHardModeEnabled = false;
+
+    public boolean evilWordleEnabled = false;
 
     private boolean firstGuessMade = false;
 
 
     public String referenceWord;
     private UserStats userStats;
-    private  Vocabulary vocabulary = new Vocabulary();
+    public Vocabulary vocabulary = new Vocabulary();
     private StatDisplayController instance = new StatDisplayController();
     public Label[][] labels;
     public int lRow = 0;
@@ -140,7 +144,13 @@ public class WordleGame {
             });
             hardModeIndicator.setVisible(isHardModeEnabled);
         }
-        referenceWord = vocabulary.getRandomWord().toUpperCase();
+        referenceWord = vocabulary.getRandomWord("").toUpperCase();
+        if (firstGuessMade) {
+            evilModeToggle.setDisable(true);
+        } else {
+            evilModeToggle.setOnAction(this::enableEvilMode);
+        }
+
         System.out.println("Word is: " + referenceWord);
         userStats = UserStats.getInstance();
         populateLabels();
@@ -153,6 +163,41 @@ public class WordleGame {
     }
     public static WordleGame getCurrentGame() {
         return currentGame;
+    }
+
+
+    /**
+     * Enable Evil Mode Wordle
+     * @param actionEvent when checkbox clicked
+     */
+    private void enableEvilMode(ActionEvent actionEvent) {
+        if(firstGuessMade) {
+            evilModeToggle.setDisable(true);
+        } else {
+            //Ensure that the user actually wants to play Evil Wordle and explain what it does
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setHeight(250);
+            alert.setTitle("Evil Wordle Confirmation");
+            alert.setHeaderText("Please confirm your choice");
+            alert.setContentText("Evil Wordle will have the game change the target word based on your recent guesses" +
+                    " to make it as difficult as possible alongside hints being disabled. " +
+                    "\nWould you like to proceed?");
+            Optional<ButtonType> confirm = alert.showAndWait();
+
+            //enable evil wordle
+            if (confirm.isPresent() && confirm.get() == ButtonType.OK) {
+                evilModeToggle.setDisable(true);
+                evilWordleEnabled = true;
+                hardModeToggle.setDisable(true);
+            } else {
+                evilModeToggle.setSelected(false);
+            }
+            Platform.runLater(() -> rootPane.requestFocus());
+
+            //eliminate hints
+            hintsUsed = 2;
+            referenceWord = "00000";
+        }
     }
 
     /**
@@ -265,6 +310,7 @@ public class WordleGame {
                 if (!firstGuessMade) {
                     firstGuessMade = true;
                     hardModeToggle.setDisable(true); // Lock the checkbox after first guess
+                    evilModeToggle.setDisable(true);
                 }
                 userStats.updateStats(word);
                 giveFeedbackOnWord(word);
@@ -326,6 +372,18 @@ public class WordleGame {
      * @param word The guessed word to be checked against the reference word.
      */
     public void giveFeedbackOnWord(String word) {
+        //checks game status
+        if(evilWordleEnabled) {
+            //should get a new word based on most recent guess
+            String tempWord = vocabulary.getRandomWord(word).toUpperCase();
+
+            //returns empty string if there are no more possible answers
+            if(!tempWord.isEmpty()) {
+
+                // changes the reference word if it isn't empty
+                referenceWord = tempWord;
+            }
+        }
         LetterStatus[] feedback = LetterStatus.getFeedback(word, referenceWord);
         feedbackHistory.add(feedback);  //stores all the feedback details, so that i can use it for hint list
         int currentRow = lRow; // Save the row index being processed
@@ -403,6 +461,13 @@ public class WordleGame {
             suggestionPopup.hide();
         hintButton.setDisable(false);
         guess_display.setText("6");
+
+        //restart evil wordle
+        evilModeToggle.setSelected(false);
+        evilModeToggle.setDisable(false);
+        evilWordleEnabled = false;
+
+        // Re-read hard mode toggle (if available) in case it was changed
         if (hardModeToggle != null) {
             isHardModeEnabled = hardModeToggle.isSelected();
         }
@@ -424,7 +489,12 @@ public class WordleGame {
                 node.setDisable(false);
             }
         });
-        referenceWord = vocabulary.getRandomWord().toUpperCase();
+
+        //reset vocabulary file in case evil wordle was played previously
+        vocabulary.vocabRestart();
+
+        // Choose a new word and reset stats
+        referenceWord = vocabulary.getRandomWord("").toUpperCase();
         System.out.println("New word: " + referenceWord);
         restartButton.setVisible(false);
         Platform.runLater(() -> rootPane.requestFocus());
