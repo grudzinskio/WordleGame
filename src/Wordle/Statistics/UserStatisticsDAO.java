@@ -144,4 +144,44 @@ public class UserStatisticsDAO {
         }
         return users;
     }
+
+    public static Map<String, Integer> getUserLetterFrequencies(String username) {
+        Map<String, Integer> letterFrequencies = new HashMap<>();
+        String query = "SELECT letter_frequencies FROM user_statistics WHERE username = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String json = rs.getString("letter_frequencies");
+                JSONObject jsonObject = new JSONObject(json);
+                for (String key : jsonObject.keySet()) {
+                    letterFrequencies.put(key, jsonObject.getInt(key));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return letterFrequencies;
+    }
+
+    public static Map<String, Integer> getUserWordFrequencies(String username) {
+        Map<String, Integer> wordFrequencies = new HashMap<>();
+        String query = "SELECT word_frequencies FROM user_statistics WHERE username = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String json = rs.getString("word_frequencies");
+                JSONObject jsonObject = new JSONObject(json);
+                for (String key : jsonObject.keySet()) {
+                    wordFrequencies.put(key, jsonObject.getInt(key));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return wordFrequencies;
+    }
 }
