@@ -1,7 +1,5 @@
 Admin 123 Admin
-piece pieces RegularUser
 IronMan123 ironrod RegularUser
-miker 123 RegularUser
-ollie 123 RegularUser
-alec 123 RegularUser
-admin 123 RegularUser
+
+oliver 123 RegularUser
+tester 123 RegularUser

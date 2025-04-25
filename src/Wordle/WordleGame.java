@@ -1,18 +1,20 @@
 package Wordle;
 
 import Wordle.Controllers.StatDisplayController;
+import Wordle.Statistics.HighScoreDAO;
 import Wordle.Statistics.UserStatisticsDAO;
 import Wordle.Statistics.UserStats;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import javafx.scene.input.KeyEvent;
@@ -21,8 +23,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * The WordleGame class handles the game logic and user interactions for the Wordle game.
@@ -32,7 +33,18 @@ import java.util.List;
  * @created 14-Feb-2025 1:31:10 PM
  */
 public class WordleGame {
-
+    public CheckBox evilModeToggle;
+    public static WordleGame currentGame;
+    @FXML
+    public Button leaderboardButton;
+    @FXML
+    private ImageView adminSettingIcon;
+    @FXML
+    private ImageView adminStatsIcon;
+    @FXML
+    private Button adminSettingsButton;
+    @FXML
+    private Button adminStatsButton;
     @FXML
     private AnchorPane rootPane;
 
@@ -53,9 +65,29 @@ public class WordleGame {
     @FXML
     private Button restartButton;
 
+    @FXML
+    private CheckBox hardModeToggle;
+
+    @FXML
+    private Label hardModeIndicator;
+
+    @FXML
+    private Button listHintButton;
+    @FXML
+    private ContextMenu suggestionPopup;   //THis is the popup where list of words are shown
+
+
+    public static boolean isHardModeEnabled = false;
+
+    public boolean evilWordleEnabled = false;
+
+    private boolean firstGuessMade = false;
+
+    private long startTime; // Timer start in milliseconds
+
     public String referenceWord;
     private UserStats userStats;
-    private  Vocabulary vocabulary = new Vocabulary();
+    public Vocabulary vocabulary = new Vocabulary();
     private StatDisplayController instance = new StatDisplayController();
     public Label[][] labels;
     public int lRow = 0;
@@ -67,6 +99,10 @@ public class WordleGame {
     public int maxHints = 2;
     public int hintsUsed = 0;
     public boolean[][] hintCells = new boolean[6][5]; // Tracks cells filled by hints.
+
+    // Stores the feedback of each word.
+    private final List<LetterStatus[]> feedbackHistory = new ArrayList<>();
+
 
     public WordleGame() {
 
@@ -91,22 +127,84 @@ public class WordleGame {
      */
     @FXML
     public void initialize() {
-        referenceWord = vocabulary.getRandomWord().toUpperCase();
+        // Set static instance reference.
+        currentGame = this;
+        userStats = UserStats.getInstance();
+        if (userStats.getUsername().equals("Admin")) {
+            adminSettingsButton.setVisible(true);
+            adminSettingIcon.setVisible(true);
+            adminStatsButton.setVisible(true);
+            adminStatsIcon.setVisible(true);
+        }
+        if (hardModeToggle != null) {
+            isHardModeEnabled = hardModeToggle.isSelected();
+            hardModeToggle.setOnAction(e -> {
+                if (!firstGuessMade) {
+                    isHardModeEnabled = hardModeToggle.isSelected();
+                    hardModeIndicator.setVisible(isHardModeEnabled);
+                } else {
+                    hardModeToggle.setDisable(true);
+                }
+            });
+            hardModeIndicator.setVisible(isHardModeEnabled);
+        }
+        referenceWord = vocabulary.getRandomWord("").toUpperCase();
+        if (firstGuessMade) {
+            evilModeToggle.setDisable(true);
+        } else {
+            evilModeToggle.setOnAction(this::enableEvilMode);
+        }
+
         System.out.println("Word is: " + referenceWord);
         userStats = UserStats.getInstance();
-
         populateLabels();
-
+        suggestionPopup = new ContextMenu();
+        suggestionPopup.setAutoHide(true);     // closes when user clicks elsewhere
         restartButton.setVisible(false);
-
-        // Ensure rootPane has focus to capture key events
         Platform.runLater(() -> rootPane.requestFocus());
-
-        // Handle key presses from physical keyboard
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
-
-        // Regain focus when clicking anywhere on the pane
         rootPane.setOnMouseClicked(event -> rootPane.requestFocus());
+
+        // Start the timer when the game challenge is accepted/started.
+        startTime = System.currentTimeMillis();
+    }
+    public static WordleGame getCurrentGame() {
+        return currentGame;
+    }
+
+
+    /**
+     * Enable Evil Mode Wordle
+     * @param actionEvent when checkbox clicked
+     */
+    private void enableEvilMode(ActionEvent actionEvent) {
+        if(firstGuessMade) {
+            evilModeToggle.setDisable(true);
+        } else {
+            //Ensure that the user actually wants to play Evil Wordle and explain what it does
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setHeight(250);
+            alert.setTitle("Evil Wordle Confirmation");
+            alert.setHeaderText("Please confirm your choice");
+            alert.setContentText("Evil Wordle will have the game change the target word based on your recent guesses" +
+                    " to make it as difficult as possible alongside hints being disabled. " +
+                    "\nWould you like to proceed?");
+            Optional<ButtonType> confirm = alert.showAndWait();
+
+            //enable evil wordle
+            if (confirm.isPresent() && confirm.get() == ButtonType.OK) {
+                evilModeToggle.setDisable(true);
+                evilWordleEnabled = true;
+                hardModeToggle.setDisable(true);
+            } else {
+                evilModeToggle.setSelected(false);
+            }
+            Platform.runLater(() -> rootPane.requestFocus());
+
+            //eliminate hints
+            hintsUsed = 2;
+            referenceWord = "00000";
+        }
     }
 
     /**
@@ -151,6 +249,9 @@ public class WordleGame {
      */
     @FXML
     private void handleKeyboardButton(ActionEvent event) {
+        if (suggestionPopup != null && suggestionPopup.isShowing()) {
+            suggestionPopup.hide();
+        }
         Button b = (Button) event.getSource();
         String buttonText = b.getText();
         if (buttonText.equals("ENTER")) {
@@ -206,9 +307,18 @@ public class WordleGame {
      * Handles enter key presses.
      */
     private void handleEnterButton() {
+        if (suggestionPopup != null && suggestionPopup.isShowing()) {
+            suggestionPopup.hide();
+        }
+
         if (lCol == 5) {
             String word = getWordFromLabel().toUpperCase(); // Ensure uppercase comparison
             if (isValidWord(word.toLowerCase())) {
+                if (!firstGuessMade) {
+                    firstGuessMade = true;
+                    hardModeToggle.setDisable(true); // Lock the checkbox after first guess
+                    evilModeToggle.setDisable(true);
+                }
                 userStats.updateStats(word);
                 giveFeedbackOnWord(word);
                 lRow++;
@@ -220,7 +330,7 @@ public class WordleGame {
 
                 // If this was the last row and game not won, count as loss
                 if (lRow == 6 && !checkWin(word)) {
-                    //userStats.updateGamesCount();
+                    UserStatisticsDAO.saveUserStatistics(userStats);
                     restartButton.setVisible(true);
                     disableInput();
                     if (StatDisplayController.instance != null) {
@@ -264,85 +374,147 @@ public class WordleGame {
      * - Yellow background if the letter is in the word but in the wrong position.
      * - Gray background if the letter is not in the word.
      *
+     * In Hard Mode, previous guesses display only color-coded feedback without showing letters.
+     *
      * @param word The guessed word to be checked against the reference word.
      */
     public void giveFeedbackOnWord(String word) {
+        //checks game status
+        if(evilWordleEnabled) {
+            //should get a new word based on most recent guess
+            String tempWord = vocabulary.getRandomWord(word).toUpperCase();
+
+            //returns empty string if there are no more possible answers
+            if(!tempWord.isEmpty()) {
+
+                // changes the reference word if it isn't empty
+                referenceWord = tempWord;
+            }
+        }
         LetterStatus[] feedback = LetterStatus.getFeedback(word, referenceWord);
-        // Apply styles based on feedback
+        feedbackHistory.add(feedback);  //stores all the feedback details, so that i can use it for hint list
+        int currentRow = lRow; // Save the row index being processed
+
+        // Apply color feedback for current guess
         for (int i = 0; i < 5; i++) {
+            Label label = labels[currentRow][i];
             LetterStatus.Status status = feedback[i].getStatus();
+            char letter = feedback[i].getLetter();
+
             switch (status) {
                 case CORRECT:
-                    labels[lRow][i].setStyle("-fx-background-color: green; -fx-text-fill: white;");
-                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: green; -fx-text-fill: white;");
+                    label.setStyle("-fx-background-color: green; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(letter, "-fx-background-color: green; -fx-text-fill: white;");
                     break;
                 case MISPLACED:
-                    labels[lRow][i].setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
-                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: yellow; -fx-text-fill: black;");
+                    label.setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
+                    updateKeyboardButtonStyle(letter, "-fx-background-color: yellow; -fx-text-fill: black;");
                     break;
                 case INCORRECT:
-                    labels[lRow][i].setStyle("-fx-background-color: gray; -fx-text-fill: white;");
-                    updateKeyboardButtonStyle(feedback[i].getLetter(), "-fx-background-color: #4F4F4F; -fx-text-fill: white;");
+                    label.setStyle("-fx-background-color: gray; -fx-text-fill: white;");
+                    updateKeyboardButtonStyle(letter, "-fx-background-color: #4F4F4F; -fx-text-fill: white;");
                     break;
+            }
+
+            // Set text only if not in hard mode, or if this is a win row
+            if (!isHardModeEnabled || checkWin(word)) {
+                label.setText(String.valueOf(letter));
+            } else {
+                label.setText(""); // Hide letters in hard mode (unless it's the win row)
             }
         }
 
-        if (checkWin(word)) {
-            //userStats.updateGamesCount();
-            UserStatisticsDAO.saveUserStatistics(userStats);
-            restartButton.setVisible(true);
+        boolean win = checkWin(word);
 
+        if (win) {
+            long endTime = System.currentTimeMillis();
+            long elapsedTimeSeconds = (endTime - startTime) / 1000;
+            HighScoreDAO.saveHighScore(userStats.getUsername(), lRow + 1, (int) elapsedTimeSeconds);
+            if (userStats != null) {
+                UserStatisticsDAO.saveUserStatistics(userStats);
+            }
+            restartButton.setVisible(true);
             disableInput();
-            System.out.println("You guessed the word correctly!");
+            System.out.println("You guessed correctly in " + elapsedTimeSeconds + " seconds and " + lRow + " guesses!");
 
             if (StatDisplayController.instance != null) {
                 StatDisplayController.instance.refreshStats();
             }
+        } else {
+            // In Hard Mode: hide the **previous row** letters (not current) after feedback is shown
+            if (isHardModeEnabled && lRow > 0) {
+                int prevRow = lRow - 1;
+                Platform.runLater(() -> {
+                    for (int i = 0; i < 5; i++) {
+                        labels[prevRow][i].setText("");
+                    }
+                });
+            }
         }
     }
 
+
     @FXML
-    private void handleRestart() {
+    public void handleRestart() {
+        firstGuessMade = false;
+        if (hardModeToggle != null) {
+            hardModeToggle.setDisable(false);
+            isHardModeEnabled = hardModeToggle.isSelected();
+            hardModeIndicator.setVisible(isHardModeEnabled);
+        }
         lRow = 0;
         lCol = 0;
         characters.clear();
-        hintsUsed = 0;                      
-        hintButton.setDisable(false);       // Re-enable the hint button
-
-        // Reset guess display
+        feedbackHistory.clear();
+        hintsUsed = 0;
+        if (suggestionPopup != null)  // just in case if pop up is open, hide it.
+            suggestionPopup.hide();
+        hintButton.setDisable(false);
         guess_display.setText("6");
 
-        // Clear grid and reset hintCells for every cell
+        //restart evil wordle
+        evilModeToggle.setSelected(false);
+        evilModeToggle.setDisable(false);
+        evilWordleEnabled = false;
+
+        // Re-read hard mode toggle (if available) in case it was changed
+        if (hardModeToggle != null) {
+            isHardModeEnabled = hardModeToggle.isSelected();
+        }
+        if (hardModeIndicator != null) {
+            hardModeIndicator.setVisible(isHardModeEnabled);
+        }
         for (int r = 0; r < 6; r++) {
             for (int c = 0; c < 5; c++) {
                 if (labels[r][c] != null) {
                     labels[r][c].setText("");
-                    labels[r][c].setStyle(""); // reset styling
+                    labels[r][c].setStyle("");
+                    hintCells[r][c] = false;
                 }
-                hintCells[r][c] = false;    // Reset hint marker for cell
             }
         }
-
-        // Reset virtual keyboard
         keyboardBox.lookupAll(".key").forEach(node -> {
             if (node instanceof Button) {
-                node.setStyle(""); // remove custom style
-                node.setDisable(false); // re-enable key
+                node.setStyle("");
+                node.setDisable(false);
             }
         });
 
-        // Choose new word
-        referenceWord = vocabulary.getRandomWord().toUpperCase();
+        //reset vocabulary file in case evil wordle was played previously
+        vocabulary.vocabRestart();
+
+        // Choose a new word and reset stats
+        referenceWord = vocabulary.getRandomWord("").toUpperCase();
         System.out.println("New word: " + referenceWord);
-
-        // Hide restart button
         restartButton.setVisible(false);
-
-        // Re-enable input
         Platform.runLater(() -> rootPane.requestFocus());
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
         userStats.resetStats();
+
+        // Restart the leaderboard time
+        startTime = System.currentTimeMillis();
     }
+
 
     /**
      * Disables input from both the physical and virtual keyboards.
@@ -364,17 +536,20 @@ public class WordleGame {
      * @param style  The new style to be applied to the button.
      */
     private void updateKeyboardButtonStyle(char letter, String style) {
+        if (keyboardBox == null) return; // Safe guard for test environments
+
         keyboardBox.lookupAll(".key").stream()
-                .map(node -> (Button) node) // Assuming all ".key" nodes are Buttons
+                .filter(node -> node instanceof Button)
+                .map(node -> (Button) node)
                 .filter(button -> button.getText().equalsIgnoreCase(String.valueOf(letter)))
                 .findFirst()
                 .ifPresent(button -> {
-                    // Check if the button is already green
                     if (!button.getStyle().contains("green")) {
                         button.setStyle(style);
                     }
                 });
     }
+
 
     /**
      * Checks if the correct letter for the given column is already revealed
@@ -401,7 +576,7 @@ public class WordleGame {
     /**
      * Provides a hint for the current guess by revealing one letter from the secret word
      * in its correct position.
-     * 
+     *
      * The method reveals one correct letter from {@code referenceWord} in its proper cell.
      * If the user has already used the maximum number of hints allowed, the system will
      * notify them that no more hints are available.
@@ -409,7 +584,7 @@ public class WordleGame {
      * whose correct letter has already been revealed.
      * The revealed letter is styled (blue background) so the user can clearly
      * differentiate it from their normal guesses.
-     * 
+     *
      */
     public void requestHint() {
         if (hintsUsed >= maxHints) {
@@ -457,6 +632,23 @@ public class WordleGame {
         stage.show();
     }
 
+    /**
+     * Created by Mathias G
+     * This launches the secondary window pop-up to display a user's stats
+     * @param actionEvent actionEvent is when the View Stats button is clicked
+     * @throws IOException Exception thrown if fxml issues occur and file can't be loaded
+     */
+    public void viewLeaderboard(ActionEvent actionEvent) throws IOException {
+        Parent stats = FXMLLoader.load(getClass().getResource("Views/HighScoreBoard.fxml"));
+        Scene scene = new Scene(stats);
+        Stage stage = new Stage();
+
+        stage.setScene(scene);
+        stage.setTitle("User Stats");
+        stage.setOnHidden(e -> requestFocusOnRootPane()); // Request focus on rootPane when window is closed
+        stage.show();
+    }
+
     public void adminSettings(ActionEvent actionEvent) throws IOException {
         Parent adminSetting = FXMLLoader.load(getClass().getResource("Views/AdminSettings.fxml"));
         Scene scene = new Scene(adminSetting);
@@ -482,4 +674,100 @@ public class WordleGame {
     private void requestFocusOnRootPane() {
         Platform.runLater(() -> rootPane.requestFocus());
     }
+
+    /**
+     * Returns up to <code>maxToReturn</code> words from the vocabulary that satisfy
+     * all information revealed so far.
+     */
+    public List<String> getWordSuggestions(int maxToReturn) {
+
+        Set<Character> greensAndYellows = new HashSet<>();
+        Map<Integer,Character> green = new HashMap<>();
+        Map<Character,Set<Integer>> yellow = new HashMap<>();
+
+
+        for (LetterStatus[] row : feedbackHistory) {
+            for (int pos = 0; pos < 5; pos++) {
+                char ch = row[pos].getLetter();
+                switch (row[pos].getStatus()) {
+                    case CORRECT -> {
+                        green.put(pos, ch);
+                        greensAndYellows.add(ch);
+                    }
+                    case MISPLACED -> {
+                        yellow.computeIfAbsent(ch,k -> new HashSet<>()).add(pos);
+                        greensAndYellows.add(ch);
+                    }
+                }
+            }
+        }
+
+
+        Set<Character> eliminated = new HashSet<>();
+        for (LetterStatus[] row : feedbackHistory) {
+            for (LetterStatus ls : row) {
+                if (ls.getStatus() == LetterStatus.Status.INCORRECT &&
+                  !greensAndYellows.contains(ls.getLetter())) {
+                    eliminated.add(ls.getLetter());
+                }
+            }
+        }
+
+       //Filter the Vocabulary
+        List<String> pool = Vocabulary.getVocabulary().getReferenceWords(); // or merged list
+        List<String> out  = new ArrayList<>();
+
+        for (String raw : pool) {
+            String word = raw.toUpperCase();
+            boolean bad = false;
+
+
+            for (char e : eliminated)
+                if (word.indexOf(e) != -1) { bad = true; break; }
+            if (bad) continue;
+
+
+            for (var g : green.entrySet())
+                if (word.charAt(g.getKey()) != g.getValue()) { bad = true; break; }
+            if (bad) continue;
+
+
+            for (var y : yellow.entrySet()) {
+                char ch = y.getKey();
+                if (word.indexOf(ch) == -1) { bad = true; break; }
+                for (int banned : y.getValue())
+                    if (word.charAt(banned) == ch) { bad = true; break; }
+                if (bad) break;
+            }
+            if (bad) continue;
+
+            out.add(raw);
+            if (out.size() == maxToReturn) break;
+        }
+        return out;
+    }
+
+    @FXML
+    private void handleListHint(ActionEvent e) {
+        if (lRow == 0) {                   // no guesses made mean so list is hidden
+            suggestionPopup.hide();
+            return;                        // simply do nothing
+        }
+        List<String> sugg = getWordSuggestions(5);
+
+        if (sugg.isEmpty()) {
+            suggestionPopup.hide();
+            return;
+        }
+        // rebuild the popup menu
+        suggestionPopup.getItems().clear();
+        for (String w : sugg) {
+            MenuItem mi = new MenuItem(w);
+            suggestionPopup.getItems().add(mi);
+        }
+        suggestionPopup.show(listHintButton, Side.BOTTOM, 0, 0);
+    }
+
+
+
 }
