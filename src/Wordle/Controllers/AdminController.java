@@ -112,7 +112,7 @@ public class AdminController {
 
     public void undoRefFileChange(ActionEvent actionEvent) {
         if (refFilePaths.isEmpty()) {
-            new Alert(Alert.AlertType.ERROR, "Unable to Undo").show();
+            new Alert(Alert.AlertType.ERROR, "Unable to Undo File").show();
         } else {
             try {
                 String old = refFilePaths.poll();

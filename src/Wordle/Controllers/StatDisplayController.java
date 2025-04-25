@@ -1,4 +1,3 @@
-// java
 package Wordle.Controllers;
 
 import Wordle.DatabaseManager;
@@ -6,6 +5,7 @@ import Wordle.Statistics.UserStats;
 import Wordle.Statistics.UserStatisticsDAO;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
@@ -13,62 +13,61 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class StatDisplayController {
 
     public static StatDisplayController instance;
 
-    @FXML
-    public Label userNameDisplay;
-    @FXML
-    public ListView<String> topLettersList;
-    @FXML
-    public ListView<String> topWordsList;
-    @FXML
-    public Label averageGuessesText;
+    @FXML public Label userNameDisplay;
+    @FXML public ListView<String> topLettersList;
+    @FXML public ListView<String> topWordsList;
+    @FXML public Label averageGuessesText;
+    @FXML public Label gamesPlayedText;
 
-    // Use this field to hold the user whose stats are to be displayed.
+    @FXML public ComboBox<String> letterSortBox;
+    @FXML public ComboBox<String> wordSortBox;
+
     private String currentUser;
 
     @FXML
     private void initialize() {
         instance = this;
-        // If not set externally, use the logged-in user.
+
         if (currentUser == null) {
             currentUser = UserStats.getInstance().getUsername();
         }
+
+        // Set up sort options
+        letterSortBox.setItems(FXCollections.observableArrayList("Sort by Frequency", "Sort A-Z"));
+        wordSortBox.setItems(FXCollections.observableArrayList("Sort by Frequency", "Sort A-Z"));
+
+        letterSortBox.setValue("Sort by Frequency");
+        wordSortBox.setValue("Sort by Frequency");
+
+        letterSortBox.setOnAction(e -> updateUI());
+        wordSortBox.setOnAction(e -> updateUI());
+
         updateUI();
     }
 
-    // Called by AdminStatsController to set the user whose stats should be shown.
     public void setUser(String username) {
         this.currentUser = username;
         updateUI();
     }
 
-    // Update the display using the currentUser
     private void updateUI() {
         userNameDisplay.setText(currentUser + "'s Statistics");
         refreshStats();
 
-        // Retrieve and sort the user's letter frequencies in descending order.
         Map<String, Integer> letterFrequencies = UserStatisticsDAO.getUserLetterFrequencies(currentUser);
-        List<String> sortedLetters = letterFrequencies.entrySet().stream()
-                .sorted(Comparator.comparing((java.util.Map.Entry<String, Integer> e) -> e.getValue()).reversed())
-                .map(e -> e.getKey() + ": " + e.getValue())
-                .collect(Collectors.toList());
-        topLettersList.setItems(FXCollections.observableArrayList(sortedLetters));
-
-        // Retrieve and sort the user's word frequencies in descending order.
         Map<String, Integer> wordFrequencies = UserStatisticsDAO.getUserWordFrequencies(currentUser);
-        List<String> sortedWords = wordFrequencies.entrySet().stream()
-                .sorted(Comparator.comparing((java.util.Map.Entry<String, Integer> e) -> e.getValue()).reversed())
-                .map(e -> e.getKey() + ": " + e.getValue())
-                .collect(Collectors.toList());
+
+        List<String> sortedLetters = sortMap(letterFrequencies, letterSortBox.getValue());
+        List<String> sortedWords = sortMap(wordFrequencies, wordSortBox.getValue());
+
+        topLettersList.setItems(FXCollections.observableArrayList(sortedLetters));
         topWordsList.setItems(FXCollections.observableArrayList(sortedWords));
     }
 
@@ -83,13 +82,31 @@ public class StatDisplayController {
 
             if (rs.next()) {
                 double avg = rs.getDouble("average_guesses");
+                int games = rs.getInt("games_played");
+
                 averageGuessesText.setText(String.format("%.2f", avg));
+                gamesPlayedText.setText(String.valueOf(games));
             } else {
                 averageGuessesText.setText("0.00");
+                gamesPlayedText.setText("0");
             }
         } catch (SQLException e) {
             e.printStackTrace();
             averageGuessesText.setText("0.00");
+            gamesPlayedText.setText("0");
         }
+    }
+
+    private List<String> sortMap(Map<String, Integer> map, String sortOption) {
+        if (sortOption == null) sortOption = "Sort by Frequency";
+
+        return map.entrySet().stream()
+                .sorted(
+                        sortOption.equals("Sort A-Z")
+                                ? Map.Entry.comparingByKey()
+                                : Map.Entry.<String, Integer>comparingByValue().reversed()
+                )
+                .map(e -> e.getKey() + ": " + e.getValue())
+                .collect(Collectors.toList());
     }
 }
