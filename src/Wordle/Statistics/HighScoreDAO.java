@@ -8,29 +8,37 @@ import java.util.List;
 
 public class HighScoreDAO {
 
-    public static void saveHighScore(String username, int guesses, int timeSeconds) {
+    // New helper method to ensure the table exists
+    private static void ensureHighScoresTableExists() {
         String createTableQuery =
                 "CREATE TABLE IF NOT EXISTS high_scores (" +
                 "username TEXT, " +
                 "guesses INTEGER, " +
                 "time_seconds INTEGER)";
-        String insertQuery = "INSERT INTO high_scores (username, guesses, time_seconds) VALUES (?, ?, ?)";
-
         try (Connection conn = DatabaseManager.getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(createTableQuery);
-            try (PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
-                pstmt.setString(1, username);
-                pstmt.setInt(2, guesses);
-                pstmt.setInt(3, timeSeconds);
-                pstmt.executeUpdate();
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveHighScore(String username, int guesses, int timeSeconds) {
+        ensureHighScoresTableExists();
+        String insertQuery = "INSERT INTO high_scores (username, guesses, time_seconds) VALUES (?, ?, ?)";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(insertQuery)) {
+            pstmt.setString(1, username);
+            pstmt.setInt(2, guesses);
+            pstmt.setInt(3, timeSeconds);
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public static List<HighScore> getHighScores() {
+        ensureHighScoresTableExists();
         List<HighScore> scores = new ArrayList<>();
         String query = "SELECT username, guesses, time_seconds FROM high_scores ORDER BY time_seconds ASC, guesses ASC";
         try (Connection conn = DatabaseManager.getConnection();
