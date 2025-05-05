@@ -5,6 +5,7 @@ import Wordle.Statistics.HighScoreDAO;
 import Wordle.Statistics.UserStatisticsDAO;
 import Wordle.Statistics.UserStats;
 import Wordle.HintManager;
+import Wordle.FeedbackManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -105,6 +106,7 @@ public class WordleGame {
     private final List<LetterStatus[]> feedbackHistory = new ArrayList<>();
 
     private HintManager hintManager;
+    private FeedbackManager feedbackManager;
 
     public WordleGame() {
 
@@ -170,6 +172,7 @@ public class WordleGame {
         // Start the timer when the game challenge is accepted/started.
         startTime = System.currentTimeMillis();
         hintManager = new HintManager(referenceWord, labels, hintCells, hintButton, maxHints);
+        feedbackManager = new FeedbackManager(labels, keyboardBox);
     }
     public static WordleGame getCurrentGame() {
         return currentGame;
@@ -382,52 +385,8 @@ public class WordleGame {
      * @param word The guessed word to be checked against the reference word.
      */
     public void giveFeedbackOnWord(String word) {
-        //checks game status
-        if(evilWordleEnabled) {
-            //should get a new word based on most recent guess
-            String tempWord = vocabulary.getRandomWord(word).toUpperCase();
-
-            //returns empty string if there are no more possible answers
-            if(!tempWord.isEmpty()) {
-
-                // changes the reference word if it isn't empty
-                referenceWord = tempWord;
-            }
-        }
-        LetterStatus[] feedback = LetterStatus.getFeedback(word, referenceWord);
-        feedbackHistory.add(feedback);  //stores all the feedback details, so that i can use it for hint list
-        int currentRow = lRow; // Save the row index being processed
-
-        // Apply color feedback for current guess
-        for (int i = 0; i < 5; i++) {
-            Label label = labels[currentRow][i];
-            LetterStatus.Status status = feedback[i].getStatus();
-            char letter = feedback[i].getLetter();
-
-            switch (status) {
-                case CORRECT:
-                    label.setStyle("-fx-background-color: green; -fx-text-fill: white;");
-                    updateKeyboardButtonStyle(letter, "-fx-background-color: green; -fx-text-fill: white;");
-                    break;
-                case MISPLACED:
-                    label.setStyle("-fx-background-color: yellow; -fx-text-fill: black;");
-                    updateKeyboardButtonStyle(letter, "-fx-background-color: yellow; -fx-text-fill: black;");
-                    break;
-                case INCORRECT:
-                    label.setStyle("-fx-background-color: gray; -fx-text-fill: white;");
-                    updateKeyboardButtonStyle(letter, "-fx-background-color: #4F4F4F; -fx-text-fill: white;");
-                    break;
-            }
-
-            // Set text only if not in hard mode, or if this is a win row
-            if (!isHardModeEnabled || checkWin(word)) {
-                label.setText(String.valueOf(letter));
-            } else {
-                label.setText(""); // Hide letters in hard mode (unless it's the win row)
-            }
-        }
-
         boolean win = checkWin(word);
+        feedbackManager.giveFeedbackOnWord(word, referenceWord, lRow, isHardModeEnabled, win, feedbackHistory);
 
         if (win) {
             long endTime = System.currentTimeMillis();
@@ -444,7 +403,6 @@ public class WordleGame {
                 StatDisplayController.instance.refreshStats();
             }
         } else {
-            // In Hard Mode: hide the **previous row** letters (not current) after feedback is shown
             if (isHardModeEnabled && lRow > 0) {
                 int prevRow = lRow - 1;
                 Platform.runLater(() -> {
