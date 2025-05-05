@@ -4,6 +4,7 @@ import Wordle.Controllers.StatDisplayController;
 import Wordle.Statistics.HighScoreDAO;
 import Wordle.Statistics.UserStatisticsDAO;
 import Wordle.Statistics.UserStats;
+import Wordle.HintManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -103,6 +104,7 @@ public class WordleGame {
     // Stores the feedback of each word.
     private final List<LetterStatus[]> feedbackHistory = new ArrayList<>();
 
+    private HintManager hintManager;
 
     public WordleGame() {
 
@@ -167,6 +169,7 @@ public class WordleGame {
 
         // Start the timer when the game challenge is accepted/started.
         startTime = System.currentTimeMillis();
+        hintManager = new HintManager(referenceWord, labels, hintCells, hintButton, maxHints);
     }
     public static WordleGame getCurrentGame() {
         return currentGame;
@@ -513,6 +516,8 @@ public class WordleGame {
 
         // Restart the leaderboard time
         startTime = System.currentTimeMillis();
+        hintManager.resetHints();
+        hintManager.updateReferenceWord(referenceWord);
     }
 
 
@@ -587,32 +592,7 @@ public class WordleGame {
      *
      */
     public void requestHint() {
-        if (hintsUsed >= maxHints) {
-            System.out.println("No more hints available.");
-            return;
-        }
-        int hintIndex = -1;
-        for (int i = 0; i < 5; i++) {
-            // Skip cells if the correct letter for that column is already revealed.
-            if (isLetterAlreadyRevealed(i)) {
-                continue;
-            }
-            hintIndex = i;
-            break;
-        }
-        if (hintIndex == -1) {
-            System.out.println("No available cell for a hint in the current row.");
-            return;
-        }
-        // Get the correct letter from the secret word for the chosen cell.
-        char hintLetter = referenceWord.charAt(hintIndex);
-        labels[lRow][hintIndex].setText(String.valueOf(hintLetter));
-        labels[lRow][hintIndex].setStyle("-fx-background-color: blue; -fx-text-fill: white;");
-        hintCells[lRow][hintIndex] = true; // Mark this cell as uneditable by hint.
-        hintsUsed++;
-        if (hintsUsed >= maxHints) {
-            hintButton.setDisable(true);
-        }
+        hintManager.requestHint(lRow);
     }
 
 	/**
