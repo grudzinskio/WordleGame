@@ -15,15 +15,12 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -49,44 +46,29 @@ public class WordleGame {
     private Button adminStatsButton;
     @FXML
     private AnchorPane rootPane;
-
     @FXML
     public GridPane gridPane;
-
     @FXML
     public VBox keyboardBox;
-
     @FXML
     public Button enterButton;
-
     @FXML
     public Button hintButton;
-
     public Label guess_display;
-
     @FXML
     private Button restartButton;
-
     @FXML
     private CheckBox hardModeToggle;
-
     @FXML
     private Label hardModeIndicator;
-
     @FXML
     private Button listHintButton;
     @FXML
     private ContextMenu suggestionPopup;   //THis is the popup where list of words are shown
-
-
     public static boolean isHardModeEnabled = false;
-
     public boolean evilWordleEnabled = false;
-
     private boolean firstGuessMade = false;
-
     private long startTime; // Timer start in milliseconds
-
     public String referenceWord;
     private UserStats userStats;
     public Vocabulary vocabulary = new Vocabulary();
@@ -109,10 +91,8 @@ public class WordleGame {
     private FeedbackManager feedbackManager;
 
     public WordleGame() {
-
         vocabulary = Vocabulary.getVocabulary();
         vocabulary.loadWords("repository/wordle-official-1.txt"); // Load dictionary words
-
     }
 
     /**
@@ -158,7 +138,6 @@ public class WordleGame {
         } else {
             evilModeToggle.setOnAction(this::enableEvilMode);
         }
-
         System.out.println("Word is: " + referenceWord);
         userStats = UserStats.getInstance();
         populateLabels();
@@ -168,7 +147,6 @@ public class WordleGame {
         Platform.runLater(() -> rootPane.requestFocus());
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
         rootPane.setOnMouseClicked(event -> rootPane.requestFocus());
-
         // Start the timer when the game challenge is accepted/started.
         startTime = System.currentTimeMillis();
         hintManager = new HintManager(referenceWord, labels, hintCells, hintButton, maxHints);
@@ -177,7 +155,6 @@ public class WordleGame {
     public static WordleGame getCurrentGame() {
         return currentGame;
     }
-
 
     /**
      * Enable Evil Mode Wordle
@@ -206,7 +183,6 @@ public class WordleGame {
                 evilModeToggle.setSelected(false);
             }
             Platform.runLater(() -> rootPane.requestFocus());
-
             //eliminate hints
             hintsUsed = 2;
             referenceWord = "00000";
@@ -316,7 +292,6 @@ public class WordleGame {
         if (suggestionPopup != null && suggestionPopup.isShowing()) {
             suggestionPopup.hide();
         }
-
         if (lCol == 5) {
             String word = getWordFromLabel().toUpperCase(); // Ensure uppercase comparison
             if (isValidWord(word.toLowerCase())) {
@@ -330,10 +305,8 @@ public class WordleGame {
                 lRow++;
                 lCol = 0;
                 characters.clear(); // Clear for next word
-
                 // Update guess display
                 guess_display.setText(String.valueOf(6 - lRow));
-
                 // If this was the last row and game not won, count as loss
                 if (lRow == 6 && !checkWin(word)) {
                     UserStatisticsDAO.saveUserStatistics(userStats);
@@ -387,7 +360,6 @@ public class WordleGame {
     public void giveFeedbackOnWord(String word) {
         boolean win = checkWin(word);
         feedbackManager.giveFeedbackOnWord(word, referenceWord, lRow, isHardModeEnabled, win, feedbackHistory);
-
         if (win) {
             long endTime = System.currentTimeMillis();
             long elapsedTimeSeconds = (endTime - startTime) / 1000;
@@ -398,7 +370,6 @@ public class WordleGame {
             restartButton.setVisible(true);
             disableInput();
             System.out.println("You guessed correctly in " + elapsedTimeSeconds + " seconds and " + lRow + " guesses!");
-
             if (StatDisplayController.instance != null) {
                 StatDisplayController.instance.refreshStats();
             }
@@ -413,7 +384,6 @@ public class WordleGame {
             }
         }
     }
-
 
     @FXML
     public void handleRestart() {
@@ -432,12 +402,10 @@ public class WordleGame {
             suggestionPopup.hide();
         hintButton.setDisable(false);
         guess_display.setText("6");
-
         //restart evil wordle
         evilModeToggle.setSelected(false);
         evilModeToggle.setDisable(false);
         evilWordleEnabled = false;
-
         // Re-read hard mode toggle (if available) in case it was changed
         if (hardModeToggle != null) {
             isHardModeEnabled = hardModeToggle.isSelected();
@@ -460,10 +428,8 @@ public class WordleGame {
                 node.setDisable(false);
             }
         });
-
         //reset vocabulary file in case evil wordle was played previously
         vocabulary.vocabRestart();
-
         // Choose a new word and reset stats
         referenceWord = vocabulary.getRandomWord("").toUpperCase();
         System.out.println("New word: " + referenceWord);
@@ -471,13 +437,11 @@ public class WordleGame {
         Platform.runLater(() -> rootPane.requestFocus());
         rootPane.setOnKeyPressed(this::handlePhysicalKeyboardInput);
         userStats.resetStats();
-
         // Restart the leaderboard time
         startTime = System.currentTimeMillis();
         hintManager.resetHints();
         hintManager.updateReferenceWord(referenceWord);
     }
-
 
     /**
      * Disables input from both the physical and virtual keyboards.
@@ -500,7 +464,6 @@ public class WordleGame {
      */
     private void updateKeyboardButtonStyle(char letter, String style) {
         if (keyboardBox == null) return; // Safe guard for test environments
-
         keyboardBox.lookupAll(".key").stream()
                 .filter(node -> node instanceof Button)
                 .map(node -> (Button) node)
@@ -512,7 +475,6 @@ public class WordleGame {
                     }
                 });
     }
-
 
     /**
      * Checks if the correct letter for the given column is already revealed
@@ -563,7 +525,6 @@ public class WordleGame {
 		Parent stats = FXMLLoader.load(getClass().getResource("Views/Stats_Display.fxml"));
 		Scene scene = new Scene(stats);
 		Stage stage = new Stage();
-
         stage.setScene(scene);
         stage.setTitle("User Stats");
         stage.setOnHidden(e -> requestFocusOnRootPane()); // Request focus on rootPane when window is closed
@@ -580,7 +541,6 @@ public class WordleGame {
         Parent stats = FXMLLoader.load(getClass().getResource("Views/HighScoreBoard.fxml"));
         Scene scene = new Scene(stats);
         Stage stage = new Stage();
-
         stage.setScene(scene);
         stage.setTitle("User Stats");
         stage.setOnHidden(e -> requestFocusOnRootPane()); // Request focus on rootPane when window is closed
@@ -591,7 +551,6 @@ public class WordleGame {
         Parent adminSetting = FXMLLoader.load(getClass().getResource("Views/AdminSettings.fxml"));
         Scene scene = new Scene(adminSetting);
         Stage stage = new Stage();
-
         stage.setScene(scene);
         stage.setTitle("Admin Settings");
         stage.setOnHidden(e -> requestFocusOnRootPane()); // Request focus on rootPane when window is closed
@@ -602,7 +561,6 @@ public class WordleGame {
         Parent adminSetting = FXMLLoader.load(getClass().getResource("Views/AdminStats.fxml"));
         Scene scene = new Scene(adminSetting);
         Stage stage = new Stage();
-
         stage.setScene(scene);
         stage.setTitle("Admin Settings");
         stage.setOnHidden(e -> requestFocusOnRootPane()); // Request focus on rootPane when window is closed
@@ -618,12 +576,9 @@ public class WordleGame {
      * all information revealed so far.
      */
     public List<String> getWordSuggestions(int maxToReturn) {
-
         Set<Character> greensAndYellows = new HashSet<>();
         Map<Integer,Character> green = new HashMap<>();
         Map<Character,Set<Integer>> yellow = new HashMap<>();
-
-
         for (LetterStatus[] row : feedbackHistory) {
             for (int pos = 0; pos < 5; pos++) {
                 char ch = row[pos].getLetter();
@@ -639,8 +594,6 @@ public class WordleGame {
                 }
             }
         }
-
-
         Set<Character> eliminated = new HashSet<>();
         for (LetterStatus[] row : feedbackHistory) {
             for (LetterStatus ls : row) {
@@ -650,26 +603,18 @@ public class WordleGame {
                 }
             }
         }
-
        //Filter the Vocabulary
         List<String> pool = Vocabulary.getVocabulary().getReferenceWords(); // or merged list
         List<String> out  = new ArrayList<>();
-
         for (String raw : pool) {
             String word = raw.toUpperCase();
             boolean bad = false;
-
-
             for (char e : eliminated)
                 if (word.indexOf(e) != -1) { bad = true; break; }
             if (bad) continue;
-
-
             for (var g : green.entrySet())
                 if (word.charAt(g.getKey()) != g.getValue()) { bad = true; break; }
             if (bad) continue;
-
-
             for (var y : yellow.entrySet()) {
                 char ch = y.getKey();
                 if (word.indexOf(ch) == -1) { bad = true; break; }
@@ -678,7 +623,6 @@ public class WordleGame {
                 if (bad) break;
             }
             if (bad) continue;
-
             out.add(raw);
             if (out.size() == maxToReturn) break;
         }
@@ -692,7 +636,6 @@ public class WordleGame {
             return;                        // simply do nothing
         }
         List<String> sugg = getWordSuggestions(5);
-
         if (sugg.isEmpty()) {
             suggestionPopup.hide();
             return;
@@ -705,7 +648,4 @@ public class WordleGame {
         }
         suggestionPopup.show(listHintButton, Side.BOTTOM, 0, 0);
     }
-
-
-
 }
