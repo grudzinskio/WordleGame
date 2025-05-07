@@ -338,6 +338,7 @@ public class WordleGame {
                 if (lRow == 6 && !checkWin(word)) {
                     UserStatisticsDAO.saveUserStatistics(userStats);
                     restartButton.setVisible(true);
+                    showBannerNotification("You lost! Try again!", "red");
                     disableInput();
                     if (StatDisplayController.instance != null) {
                         StatDisplayController.instance.refreshStats();
@@ -345,7 +346,7 @@ public class WordleGame {
                 }
             } else {
 
-                showBannerNotification("Word not in list.", "red");
+                showBannerNotification("Word not in list.", "orange");
             }
         }
     }
