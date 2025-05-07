@@ -4,10 +4,12 @@ import Wordle.Controllers.StatDisplayController;
 import Wordle.Statistics.HighScoreDAO;
 import Wordle.Statistics.UserStatisticsDAO;
 import Wordle.Statistics.UserStats;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -15,12 +17,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.*;
@@ -332,13 +338,15 @@ public class WordleGame {
                 if (lRow == 6 && !checkWin(word)) {
                     UserStatisticsDAO.saveUserStatistics(userStats);
                     restartButton.setVisible(true);
+                    showBannerNotification("You lost! Try again!", "red");
                     disableInput();
                     if (StatDisplayController.instance != null) {
                         StatDisplayController.instance.refreshStats();
                     }
                 }
             } else {
-                System.out.println("Word not in list.");
+
+                showBannerNotification("Word not in list.", "orange");
             }
         }
     }
@@ -364,6 +372,44 @@ public class WordleGame {
      */
     public boolean isValidWord(String word) {
         return vocabulary.contains(word);
+    }
+
+    /**
+     * Shows a banner at the top of the screen displaying a message
+     * @param message message that needs to be displayed (e.g. you've won!)
+     * @param color background color for the message (changes based on usage of message)
+     */
+    private void showBannerNotification(String message, String color) {
+        Label banner = new Label(message);
+        banner.setFont(Font.font(18));
+        banner.setTextFill(Color.WHITE);
+        banner.setStyle("-fx-background-color:" + color +";");
+        banner.setAlignment(Pos.CENTER);
+        banner.setMaxWidth(Double.MAX_VALUE);
+        rootPane.getChildren().add(banner);
+        AnchorPane.setTopAnchor(banner, 10.0);
+
+        banner.setLayoutX(0);
+
+        banner.translateXProperty().bind(
+                rootPane.widthProperty()
+                        .subtract(banner.widthProperty())
+                        .divide(2)
+        );
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(500), banner);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(500), banner);
+        fadeOut.setFromValue(1);
+        fadeOut.setToValue(0);
+        fadeOut.setDelay(Duration.seconds(2));
+
+        fadeIn.setOnFinished(e -> fadeOut.play());
+        fadeOut.setOnFinished(e -> rootPane.getChildren().remove(banner));
+
+        fadeIn.play();
     }
 
     /**
@@ -435,7 +481,8 @@ public class WordleGame {
             }
             restartButton.setVisible(true);
             disableInput();
-            System.out.println("You guessed correctly in " + elapsedTimeSeconds + " seconds and " + lRow + " guesses!");
+            String message = "You guessed correctly in " + elapsedTimeSeconds + " seconds and " + (lRow+1) + " guesses!";
+            showBannerNotification(message, "green");
 
             if (StatDisplayController.instance != null) {
                 StatDisplayController.instance.refreshStats();
@@ -588,7 +635,7 @@ public class WordleGame {
      */
     public void requestHint() {
         if (hintsUsed >= maxHints) {
-            System.out.println("No more hints available.");
+            showBannerNotification("No more hints available.", "blue");
             return;
         }
         int hintIndex = -1;
@@ -601,7 +648,7 @@ public class WordleGame {
             break;
         }
         if (hintIndex == -1) {
-            System.out.println("No available cell for a hint in the current row.");
+            showBannerNotification("No available cell for a hint in the current row.", "blue");
             return;
         }
         // Get the correct letter from the secret word for the chosen cell.
@@ -610,9 +657,7 @@ public class WordleGame {
         labels[lRow][hintIndex].setStyle("-fx-background-color: blue; -fx-text-fill: white;");
         hintCells[lRow][hintIndex] = true; // Mark this cell as uneditable by hint.
         hintsUsed++;
-        if (hintsUsed >= maxHints) {
-            hintButton.setDisable(true);
-        }
+
     }
 
 	/**
